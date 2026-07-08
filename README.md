@@ -1,6 +1,6 @@
 # My Week Done
 
-Tracker de rotina fixa recorrente — blocos de horário que se repetem toda semana.
+Tracker de rotina fixa recorrente / blocos de horário que se repetem toda semana.
 
 ## Estrutura do projeto
 
@@ -33,7 +33,3 @@ lib/
 flutter pub get
 flutter run
 ```
-
-## Docs
-
-Ver `docs/brainstorm.md` e `docs/architecture.md` para escopo do MVP.
