@@ -22,6 +22,48 @@ Indicador visual de "hoje" (destaque na coluna do dia atual)
 - % de aderência da semana (blocos concluídos / total esperado)
 - Histórico simples: últimos 7 dias, visual tipo streak
 
+## Épico 5 - Floating tasks
+
+routine_blocks representa recorrência fixa (mesma hora, mesmo(s) dia(s), toda semana). Uma tarefa solta com prazo é o oposto: acontece uma vez, não tem hora fixa, e sua visibilidade muda com o tempo (ela "aparece" nos dias antes do prazo, não só no dia do prazo). Forçar isso na tabela existente ia exigir campos nulos demais e lógica condicional espalhada pela UI. Melhor uma tabela nova, propósito único.
+
+exemplo de caso de uso: usuario fica com tempo livre na terça, abre o app pra consultar suas tarefas e ve que tem uma tarefa sem dia definido, mas com prazo de quinta feira na visao 'hoje'
+
+Modelo de dados novo
+Tabela floating_tasks
+
+id
+título
+categoria (opcional, reaproveita as mesmas cores dos blocos)
+prazo (data, opcional — pode não ter prazo nenhum)
+concluído (bool)
+concluído_em (timestamp, pra histórico)
+criado_em
+
+Regra de exibição:
+Na tela "hoje", uma nova seção abaixo dos blocos com horário, tipo "tarefas soltas":
+Sem prazo: aparece todo santo dia até ser concluída (não some sozinha)
+Com prazo futuro: aparece todo dia a partir de quando foi criada até ser concluída — é exatamente seu caso de uso, terça vendo a tarefa que vence quinta
+Prazo é hoje: destaque visual (ex: cor de urgência)
+Prazo vencido: destaque mais forte (vermelho/atrasado), mas continua aparecendo — nunca some sozinha, só quando concluída
+
+Ordenação dentro da seção: prazo mais próximo primeiro, sem-prazo por último (ou por ordem de criação).
+
+Decisão de escopo: essas tarefas não entram no anel de aderência (Épico 4). Aderência é sobre constância de rotina fixa; tarefa avulsa é outra categoria de compromisso. Misturar os dois dilui o significado do número.
+
+Impacto nas outras telas
+
+Form de criação (Épico 3) precisa de um toggle no topo: "rotina fixa" vs "tarefa solta". Se for tarefa solta, os campos mudam: some dia da semana e hora, aparece um date picker opcional de prazo.
+Tela de blocos: passa a listar duas seções (rotinas fixas / tarefas soltas) ou uma aba extra — decisão de UI pra hora de implementar.
+
+resumo:
+- Tabela floating_tasks: id, título, categoria (opcional), prazo (data opcional), 
+  concluído (bool), concluído_em, criado_em
+- Nova seção "tarefas soltas" na tela principal (hoje), abaixo dos blocos com horário
+- Regra de exibição: sem prazo = aparece todo dia; com prazo = aparece desde a criação 
+  até concluir; prazo hoje/vencido = destaque visual de urgência
+- Form de criação com toggle "rotina fixa" / "tarefa solta" (campos mudam conforme o tipo)
+- Fora do escopo do Épico 5: essas tarefas NÃO contam pro anel de aderência do Épico 4
+
 ## Fora do MVP v1 (fica pra v2)
 - Auth / multi-dispositivo (Supabase entra aqui)
 - Widget de home screen

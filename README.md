@@ -34,6 +34,14 @@ flutter pub get
 flutter run
 ```
 
+## Ícone do app
+
+Fonte em `assets/icons/app_icon.png`. Para regenerar os ícones das plataformas após alterar a imagem:
+
+```bash
+dart run flutter_launcher_icons
+```
+
 ## Docs
 
 Ver `docs/brainstorm.md` e `docs/architecture.md` para escopo do MVP.
