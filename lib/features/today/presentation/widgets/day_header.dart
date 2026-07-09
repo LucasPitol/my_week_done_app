@@ -28,10 +28,17 @@ class DayHeader extends StatelessWidget {
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (isToday)
-            Container(
+          const SizedBox(width: 8),
+          Visibility(
+            visible: isToday,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withValues(alpha: 0.12),
@@ -48,6 +55,7 @@ class DayHeader extends StatelessWidget {
                 ),
               ),
             ),
+          ),
         ],
       ),
     );

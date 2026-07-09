@@ -46,6 +46,7 @@ domain.RoutineBlock routineBlockFromRow(RoutineBlockRow row) {
     startTime: parseStartTime(row.startTime),
     title: row.title,
     category: row.category,
+    groupId: row.groupId,
   );
 }
 
@@ -56,6 +57,7 @@ RoutineBlocksCompanion routineBlockToCompanion(domain.RoutineBlock block) {
     startTime: formatStartTime(block.startTime),
     title: block.title,
     category: Value(block.category),
+    groupId: Value(block.groupId),
   );
 }
 

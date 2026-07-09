@@ -11,6 +11,7 @@ class WeekDayHeader extends StatelessWidget {
     required this.focusedDate,
     required this.dayColumnWidth,
     required this.timeColumnWidth,
+    this.showTimeColumn = true,
   });
 
   final List<DateTime> weekDays;
@@ -18,6 +19,7 @@ class WeekDayHeader extends StatelessWidget {
   final DateTime focusedDate;
   final double dayColumnWidth;
   final double timeColumnWidth;
+  final bool showTimeColumn;
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +29,15 @@ class WeekDayHeader extends StatelessWidget {
 
     return Row(
       children: [
-        SizedBox(
-          width: timeColumnWidth,
-          child: Text(
-            'Hora',
-            style: theme.textTheme.labelSmall,
-            textAlign: TextAlign.center,
+        if (showTimeColumn)
+          SizedBox(
+            width: timeColumnWidth,
+            child: Text(
+              'Hora',
+              style: theme.textTheme.labelSmall,
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
         ...weekDays.map((day) {
           final isToday = isSameDay(day, today);
           final isFocused = isSameDay(day, focusedDate);

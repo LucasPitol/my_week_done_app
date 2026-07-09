@@ -27,6 +27,7 @@ void main() {
         startTime: DateTime(2000, 1, 1, 7, 30),
         title: 'Treino',
         category: 'saude',
+        groupId: 'group-1',
       );
 
       await repository.saveRoutineBlock(block);
@@ -37,6 +38,7 @@ void main() {
       expect(blocks.first.weekday, 1);
       expect(blocks.first.title, 'Treino');
       expect(blocks.first.category, 'saude');
+      expect(blocks.first.groupId, 'group-1');
       expect(blocks.first.startTime.hour, 7);
       expect(blocks.first.startTime.minute, 30);
     });

@@ -42,6 +42,12 @@ final dayBlocksProvider = Provider.family<List<RoutineBlock>, int>((ref, weekday
   return filtered;
 });
 
+/// Atualiza a cada 30s para transições de destaque temporal na visão Dia.
+final nowProvider = StreamProvider<DateTime>((ref) async* {
+  yield DateTime.now();
+  yield* Stream.periodic(const Duration(seconds: 30), (_) => DateTime.now());
+});
+
 String completionKey(String blockId, DateTime date) {
   return '$blockId-${date.year}-${date.month}-${date.day}';
 }

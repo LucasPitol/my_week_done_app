@@ -24,6 +24,12 @@ class WeekGrid extends ConsumerWidget {
   static const dayColumnWidth = 72.0;
   static const rowHeight = 68.0;
 
+  static double daysWidth(int dayCount) =>
+      (dayColumnWidth + 4) * dayCount;
+
+  static double gridWidth(int dayCount) =>
+      timeColumnWidth + daysWidth(dayCount);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -57,7 +63,7 @@ class WeekGrid extends ConsumerWidget {
   }
 }
 
-class _WeekGridBody extends StatelessWidget {
+class _WeekGridBody extends StatefulWidget {
   const _WeekGridBody({
     required this.theme,
     required this.blocks,
@@ -81,35 +87,84 @@ class _WeekGridBody extends StatelessWidget {
   ) onToggle;
 
   @override
+  State<_WeekGridBody> createState() => _WeekGridBodyState();
+}
+
+class _WeekGridBodyState extends State<_WeekGridBody> {
+  late final ScrollController _horizontalScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _horizontalScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _horizontalScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final weekDays = daysOfWeek(weekStart);
-    final hours = hourSlotsForBlocks(blocks);
-    final completionLookup = buildCompletionLookup(completions);
-    final gridWidth = WeekGrid.timeColumnWidth + (WeekGrid.dayColumnWidth + 4) * 7;
+    final weekDays = daysOfWeek(widget.weekStart);
+    final hours = hourSlotsForBlocks(widget.blocks);
+    final completionLookup = buildCompletionLookup(widget.completions);
+    final daysWidth = WeekGrid.daysWidth(weekDays.length);
+    final gridWidth = WeekGrid.gridWidth(weekDays.length);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: gridWidth,
-            child: WeekDayHeader(
-              weekDays: weekDays,
-              today: today,
-              focusedDate: focusedDate,
-              dayColumnWidth: WeekGrid.dayColumnWidth,
-              timeColumnWidth: WeekGrid.timeColumnWidth,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: WeekGrid.timeColumnWidth,
+              child: Text(
+                'Hora',
+                style: widget.theme.textTheme.labelSmall,
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
+            Expanded(
+              child: ClipRect(
+                child: AnimatedBuilder(
+                  animation: _horizontalScrollController,
+                  builder: (context, child) {
+                    final offset = _horizontalScrollController.hasClients
+                        ? _horizontalScrollController.offset
+                        : 0.0;
+
+                    return Transform.translate(
+                      offset: Offset(-offset, 0),
+                      child: child,
+                    );
+                  },
+                  child: SizedBox(
+                    width: daysWidth,
+                    child: WeekDayHeader(
+                      weekDays: weekDays,
+                      today: widget.today,
+                      focusedDate: widget.focusedDate,
+                      dayColumnWidth: WeekGrid.dayColumnWidth,
+                      timeColumnWidth: WeekGrid.timeColumnWidth,
+                      showTimeColumn: false,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Expanded(
-          child: blocks.isEmpty
-              ? _EmptyWeekState(theme: theme)
+          child: widget.blocks.isEmpty
+              ? _EmptyWeekState(theme: widget.theme)
               : SingleChildScrollView(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
+                    controller: _horizontalScrollController,
                     child: SizedBox(
                       width: gridWidth,
                       child: Column(
@@ -118,11 +173,11 @@ class _WeekGridBody extends StatelessWidget {
                             _HourRow(
                               hour: hour,
                               weekDays: weekDays,
-                              blocks: blocks,
-                              today: today,
-                              focusedDate: focusedDate,
+                              blocks: widget.blocks,
+                              today: widget.today,
+                              focusedDate: widget.focusedDate,
                               completionLookup: completionLookup,
-                              onToggle: onToggle,
+                              onToggle: widget.onToggle,
                             ),
                         ],
                       ),

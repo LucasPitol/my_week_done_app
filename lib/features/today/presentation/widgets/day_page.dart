@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/routine_proximity.dart';
 import '../../providers/today_providers.dart';
 import 'day_block_tile.dart';
 
@@ -19,6 +20,7 @@ class DayPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final blocks = ref.watch(dayBlocksProvider(date.weekday));
     final completionsAsync = ref.watch(dayCompletionsProvider(date));
+    final now = ref.watch(nowProvider).valueOrNull ?? DateTime.now();
 
     return completionsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -66,6 +68,12 @@ class DayPage extends ConsumerWidget {
                 return DayBlockTile(
                   block: block,
                   completed: completed,
+                  proximityHighlight: routineProximityHighlight(
+                    date: date,
+                    now: now,
+                    blockStartTime: block.startTime,
+                    completed: completed,
+                  ),
                   onToggle: () => toggleBlockCompletion(
                     ref,
                     routineBlockId: block.id,

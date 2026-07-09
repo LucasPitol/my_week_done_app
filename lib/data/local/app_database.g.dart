@@ -60,6 +60,17 @@ class $RoutineBlocksTable extends RoutineBlocks
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _groupIdMeta = const VerificationMeta(
+    'groupId',
+  );
+  @override
+  late final GeneratedColumn<String> groupId = GeneratedColumn<String>(
+    'group_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -67,6 +78,7 @@ class $RoutineBlocksTable extends RoutineBlocks
     startTime,
     title,
     category,
+    groupId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -115,6 +127,12 @@ class $RoutineBlocksTable extends RoutineBlocks
         category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
       );
     }
+    if (data.containsKey('group_id')) {
+      context.handle(
+        _groupIdMeta,
+        groupId.isAcceptableOrUnknown(data['group_id']!, _groupIdMeta),
+      );
+    }
     return context;
   }
 
@@ -144,6 +162,10 @@ class $RoutineBlocksTable extends RoutineBlocks
         DriftSqlType.string,
         data['${effectivePrefix}category'],
       ),
+      groupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_id'],
+      ),
     );
   }
 
@@ -159,12 +181,14 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
   final String startTime;
   final String title;
   final String? category;
+  final String? groupId;
   const RoutineBlockRow({
     required this.id,
     required this.weekday,
     required this.startTime,
     required this.title,
     this.category,
+    this.groupId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -175,6 +199,9 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
     map['title'] = Variable<String>(title);
     if (!nullToAbsent || category != null) {
       map['category'] = Variable<String>(category);
+    }
+    if (!nullToAbsent || groupId != null) {
+      map['group_id'] = Variable<String>(groupId);
     }
     return map;
   }
@@ -188,6 +215,9 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
       category: category == null && nullToAbsent
           ? const Value.absent()
           : Value(category),
+      groupId: groupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(groupId),
     );
   }
 
@@ -202,6 +232,7 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
       startTime: serializer.fromJson<String>(json['startTime']),
       title: serializer.fromJson<String>(json['title']),
       category: serializer.fromJson<String?>(json['category']),
+      groupId: serializer.fromJson<String?>(json['groupId']),
     );
   }
   @override
@@ -213,6 +244,7 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
       'startTime': serializer.toJson<String>(startTime),
       'title': serializer.toJson<String>(title),
       'category': serializer.toJson<String?>(category),
+      'groupId': serializer.toJson<String?>(groupId),
     };
   }
 
@@ -222,12 +254,14 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
     String? startTime,
     String? title,
     Value<String?> category = const Value.absent(),
+    Value<String?> groupId = const Value.absent(),
   }) => RoutineBlockRow(
     id: id ?? this.id,
     weekday: weekday ?? this.weekday,
     startTime: startTime ?? this.startTime,
     title: title ?? this.title,
     category: category.present ? category.value : this.category,
+    groupId: groupId.present ? groupId.value : this.groupId,
   );
   RoutineBlockRow copyWithCompanion(RoutineBlocksCompanion data) {
     return RoutineBlockRow(
@@ -236,6 +270,7 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
       startTime: data.startTime.present ? data.startTime.value : this.startTime,
       title: data.title.present ? data.title.value : this.title,
       category: data.category.present ? data.category.value : this.category,
+      groupId: data.groupId.present ? data.groupId.value : this.groupId,
     );
   }
 
@@ -246,13 +281,15 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
           ..write('weekday: $weekday, ')
           ..write('startTime: $startTime, ')
           ..write('title: $title, ')
-          ..write('category: $category')
+          ..write('category: $category, ')
+          ..write('groupId: $groupId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, weekday, startTime, title, category);
+  int get hashCode =>
+      Object.hash(id, weekday, startTime, title, category, groupId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -261,7 +298,8 @@ class RoutineBlockRow extends DataClass implements Insertable<RoutineBlockRow> {
           other.weekday == this.weekday &&
           other.startTime == this.startTime &&
           other.title == this.title &&
-          other.category == this.category);
+          other.category == this.category &&
+          other.groupId == this.groupId);
 }
 
 class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
@@ -270,6 +308,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
   final Value<String> startTime;
   final Value<String> title;
   final Value<String?> category;
+  final Value<String?> groupId;
   final Value<int> rowid;
   const RoutineBlocksCompanion({
     this.id = const Value.absent(),
@@ -277,6 +316,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
     this.startTime = const Value.absent(),
     this.title = const Value.absent(),
     this.category = const Value.absent(),
+    this.groupId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   RoutineBlocksCompanion.insert({
@@ -285,6 +325,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
     required String startTime,
     required String title,
     this.category = const Value.absent(),
+    this.groupId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        weekday = Value(weekday),
@@ -296,6 +337,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
     Expression<String>? startTime,
     Expression<String>? title,
     Expression<String>? category,
+    Expression<String>? groupId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -304,6 +346,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
       if (startTime != null) 'start_time': startTime,
       if (title != null) 'title': title,
       if (category != null) 'category': category,
+      if (groupId != null) 'group_id': groupId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -314,6 +357,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
     Value<String>? startTime,
     Value<String>? title,
     Value<String?>? category,
+    Value<String?>? groupId,
     Value<int>? rowid,
   }) {
     return RoutineBlocksCompanion(
@@ -322,6 +366,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
       startTime: startTime ?? this.startTime,
       title: title ?? this.title,
       category: category ?? this.category,
+      groupId: groupId ?? this.groupId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -344,6 +389,9 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
     if (category.present) {
       map['category'] = Variable<String>(category.value);
     }
+    if (groupId.present) {
+      map['group_id'] = Variable<String>(groupId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -358,6 +406,7 @@ class RoutineBlocksCompanion extends UpdateCompanion<RoutineBlockRow> {
           ..write('startTime: $startTime, ')
           ..write('title: $title, ')
           ..write('category: $category, ')
+          ..write('groupId: $groupId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -770,6 +819,7 @@ typedef $$RoutineBlocksTableCreateCompanionBuilder =
       required String startTime,
       required String title,
       Value<String?> category,
+      Value<String?> groupId,
       Value<int> rowid,
     });
 typedef $$RoutineBlocksTableUpdateCompanionBuilder =
@@ -779,6 +829,7 @@ typedef $$RoutineBlocksTableUpdateCompanionBuilder =
       Value<String> startTime,
       Value<String> title,
       Value<String?> category,
+      Value<String?> groupId,
       Value<int> rowid,
     });
 
@@ -846,6 +897,11 @@ class $$RoutineBlocksTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> dailyCompletionsRefs(
     Expression<bool> Function($$DailyCompletionsTableFilterComposer f) f,
   ) {
@@ -905,6 +961,11 @@ class $$RoutineBlocksTableOrderingComposer
     column: $table.category,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get groupId => $composableBuilder(
+    column: $table.groupId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$RoutineBlocksTableAnnotationComposer
@@ -930,6 +991,9 @@ class $$RoutineBlocksTableAnnotationComposer
 
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get groupId =>
+      $composableBuilder(column: $table.groupId, builder: (column) => column);
 
   Expression<T> dailyCompletionsRefs<T extends Object>(
     Expression<T> Function($$DailyCompletionsTableAnnotationComposer a) f,
@@ -990,6 +1054,7 @@ class $$RoutineBlocksTableTableManager
                 Value<String> startTime = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String?> category = const Value.absent(),
+                Value<String?> groupId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RoutineBlocksCompanion(
                 id: id,
@@ -997,6 +1062,7 @@ class $$RoutineBlocksTableTableManager
                 startTime: startTime,
                 title: title,
                 category: category,
+                groupId: groupId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -1006,6 +1072,7 @@ class $$RoutineBlocksTableTableManager
                 required String startTime,
                 required String title,
                 Value<String?> category = const Value.absent(),
+                Value<String?> groupId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RoutineBlocksCompanion.insert(
                 id: id,
@@ -1013,6 +1080,7 @@ class $$RoutineBlocksTableTableManager
                 startTime: startTime,
                 title: title,
                 category: category,
+                groupId: groupId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

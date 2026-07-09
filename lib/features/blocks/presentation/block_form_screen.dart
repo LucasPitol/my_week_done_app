@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/week_utils.dart';
 import '../../../domain/entities/routine_block.dart';
+import '../../today/providers/today_providers.dart';
 import '../domain/block_form_utils.dart';
+import '../domain/block_group_utils.dart';
 import '../providers/blocks_providers.dart';
+import 'widgets/block_scope_dialog.dart';
 import 'widgets/category_selector.dart';
 import 'widgets/weekday_selector.dart';
 
@@ -31,6 +35,8 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
   late TimeOfDay _selectedTime;
   String? _selectedCategory;
   bool _isSaving = false;
+  bool _initialWeekdaysLoaded = false;
+  List<RoutineBlock> _groupMembers = [];
 
   @override
   void initState() {
@@ -46,9 +52,20 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
     if (widget.isEditing) {
       _selectedWeekdays = {widget.block!.weekday};
     } else if (widget.duplicateFrom != null) {
-      _selectedWeekdays = {};
+      _selectedWeekdays = {widget.duplicateFrom!.weekday};
     } else {
       _selectedWeekdays = {};
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.isEditing && !_initialWeekdaysLoaded) {
+      final allBlocks = ref.read(routineBlocksProvider).valueOrNull ?? [];
+      _groupMembers = blocksInGroup(allBlocks, widget.block!);
+      _selectedWeekdays = weekdaysInGroup(_groupMembers);
+      _initialWeekdaysLoaded = true;
     }
   }
 
@@ -75,6 +92,33 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
     }
   }
 
+  Future<BlockScopeChoice?> _resolveScopeChoice({
+    required bool isDelete,
+  }) async {
+    if (_groupMembers.length <= 1) {
+      return isDelete ? BlockScopeChoice.singleOnly : BlockScopeChoice.allInGroup;
+    }
+
+    final otherDays = formatOtherWeekdaysLabel(
+      weekdaysInGroup(_groupMembers),
+      excludeWeekday: widget.block!.weekday,
+    );
+
+    return showBlockScopeDialog(
+      context,
+      title: isDelete ? 'Excluir rotina?' : 'Salvar alterações',
+      message: isDelete
+          ? 'Esta rotina também existe em $otherDays.'
+          : 'Esta rotina também existe em $otherDays. Como deseja aplicar?',
+      allLabel: isDelete
+          ? 'Excluir todas as ocorrências'
+          : 'Aplicar a todas as ocorrências',
+      singleLabel: isDelete
+          ? 'Excluir apenas ${weekdayFullLabels[widget.block!.weekday]}'
+          : 'Alterar apenas ${weekdayFullLabels[widget.block!.weekday]}',
+    );
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -85,24 +129,50 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
       return;
     }
 
-    setState(() => _isSaving = true);
-
     final startTime = dateTimeFromTimeOfDay(_selectedTime);
+    final title = _titleController.text.trim();
     final actions = ref.read(blockActionsProvider);
+
+    var applyToAll = true;
+    if (widget.isEditing) {
+      final hasChanges = hasGroupChanges(
+        block: widget.block!,
+        groupBlocks: _groupMembers,
+        title: title,
+        startTime: startTime,
+        weekdays: _selectedWeekdays,
+        category: _selectedCategory,
+      );
+
+      if (!hasChanges) {
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        return;
+      }
+
+      if (_groupMembers.length > 1) {
+        final scope = await _resolveScopeChoice(isDelete: false);
+        if (!mounted || scope == null) return;
+        applyToAll = scope == BlockScopeChoice.allInGroup;
+      }
+    }
+
+    setState(() => _isSaving = true);
 
     try {
       if (widget.isEditing) {
         await actions.updateBlock(
-          widget.block!.copyWith(
-            title: _titleController.text.trim(),
-            weekday: _selectedWeekdays.first,
-            startTime: startTime,
-            category: _selectedCategory,
-          ),
+          block: widget.block!,
+          groupMembers: _groupMembers,
+          title: title,
+          startTime: startTime,
+          weekdays: _selectedWeekdays,
+          category: _selectedCategory,
+          applyToAll: applyToAll,
         );
       } else {
         await actions.createBlocks(
-          title: _titleController.text.trim(),
+          title: title,
           startTime: startTime,
           weekdays: _selectedWeekdays,
           category: _selectedCategory,
@@ -119,29 +189,40 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
   Future<void> _delete() async {
     if (!widget.isEditing) return;
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Excluir rotina?'),
-        content: Text(
-          'A rotina "${widget.block!.title}" será removida.',
+    var deleteAll = false;
+    if (_groupMembers.length > 1) {
+      final scope = await _resolveScopeChoice(isDelete: true);
+      if (!mounted || scope == null) return;
+      deleteAll = scope == BlockScopeChoice.allInGroup;
+    } else {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Excluir rotina?'),
+          content: Text(
+            'A rotina "${widget.block!.title}" será removida.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Excluir'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
-    );
+      );
 
-    if (confirmed != true || !mounted) return;
+      if (confirmed != true || !mounted) return;
+    }
 
-    await ref.read(blockActionsProvider).deleteBlock(widget.block!.id);
+    await ref.read(blockActionsProvider).deleteBlock(
+          block: widget.block!,
+          groupMembers: _groupMembers,
+          deleteAll: deleteAll,
+        );
     if (!mounted) return;
     Navigator.of(context).pop();
   }
@@ -199,10 +280,7 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
               label: Text(formatBlockTime(dateTimeFromTimeOfDay(_selectedTime))),
             ),
             const SizedBox(height: 24),
-            Text(
-              isEditing ? 'Dia da semana' : 'Dias da semana',
-              style: theme.textTheme.titleSmall,
-            ),
+            Text('Dias da semana', style: theme.textTheme.titleSmall),
             const SizedBox(height: 4),
             if (!isEditing)
               Text(
@@ -210,11 +288,17 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
+              )
+            else if (_groupMembers.length > 1)
+              Text(
+                'Alterações podem ser aplicadas a todos os dias desta rotina.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             const SizedBox(height: 8),
             WeekdaySelector(
               selectedWeekdays: _selectedWeekdays,
-              singleSelection: isEditing,
               onChanged: (days) => setState(() => _selectedWeekdays = days),
             ),
             const SizedBox(height: 8),

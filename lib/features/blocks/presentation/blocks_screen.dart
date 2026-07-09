@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/week_utils.dart';
 import '../../../domain/entities/routine_block.dart';
 import '../../today/providers/today_providers.dart';
+import '../domain/block_group_utils.dart';
 import '../providers/blocks_providers.dart';
 import 'block_form_screen.dart';
 import 'widgets/block_list_tile.dart';
+import 'widgets/block_scope_dialog.dart';
 import 'widgets/empty_blocks_state.dart';
 
 class BlocksScreen extends ConsumerWidget {
@@ -41,27 +43,53 @@ class BlocksScreen extends ConsumerWidget {
     WidgetRef ref,
     RoutineBlock block,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Excluir rotina?'),
-        content: Text('A rotina "${block.title}" será removida.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
-    );
+    final allBlocks = ref.read(routineBlocksProvider).valueOrNull ?? [];
+    final groupMembers = blocksInGroup(allBlocks, block);
 
-    if (confirmed == true) {
-      await ref.read(blockActionsProvider).deleteBlock(block.id);
+    var deleteAll = false;
+    if (groupMembers.length > 1) {
+      final otherDays = formatOtherWeekdaysLabel(
+        weekdaysInGroup(groupMembers),
+        excludeWeekday: block.weekday,
+      );
+
+      final choice = await showBlockScopeDialog(
+        context,
+        title: 'Excluir rotina?',
+        message: 'Esta rotina também existe em $otherDays.',
+        allLabel: 'Excluir todas as ocorrências',
+        singleLabel: 'Excluir apenas ${weekdayFullLabels[block.weekday]}',
+      );
+
+      if (choice == null) return;
+      deleteAll = choice == BlockScopeChoice.allInGroup;
+    } else {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Excluir rotina?'),
+          content: Text('A rotina "${block.title}" será removida.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Excluir'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) return;
     }
+
+    await ref.read(blockActionsProvider).deleteBlock(
+          block: block,
+          groupMembers: groupMembers,
+          deleteAll: deleteAll,
+        );
   }
 
   @override
