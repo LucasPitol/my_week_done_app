@@ -12,6 +12,8 @@ class MyWeekDoneApp extends StatelessWidget {
     return MaterialApp(
       title: AppConstants.appName,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.dark,
       home: const MainShell(),
       showSemanticsDebugger: false,
     );
