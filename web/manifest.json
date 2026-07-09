@@ -1,6 +1,6 @@
 {
-    "name": "my_week_done_app",
-    "short_name": "my_week_done_app",
+    "name": "Habi",
+    "short_name": "Habi",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#1C2127",

@@ -1,5 +1,5 @@
 class AppConstants {
-  static const appName = 'My Week Done';
+  static const appName = 'Habi';
 
   static const tabToday = 0;
   static const tabBlocks = 1;
