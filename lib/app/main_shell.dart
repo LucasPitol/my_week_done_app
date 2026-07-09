@@ -44,7 +44,7 @@ class _MainShellState extends State<MainShell> {
       floatingActionButton: showFab
           ? FloatingActionButton(
               onPressed: _openCreateForm,
-              tooltip: 'Nova rotina',
+              tooltip: 'Novo',
               child: const Icon(TablerIcons.plus),
             )
           : null,

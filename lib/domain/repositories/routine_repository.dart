@@ -1,4 +1,5 @@
 import '../entities/daily_completion.dart';
+import '../entities/floating_task.dart';
 import '../entities/routine_block.dart';
 
 abstract class RoutineRepository {
@@ -25,4 +26,15 @@ abstract class RoutineRepository {
   });
 
   Future<double> adherenceForWeek(DateTime weekStart);
+
+  Stream<List<FloatingTask>> watchFloatingTasks();
+
+  Future<void> saveFloatingTask(FloatingTask task);
+
+  Future<void> deleteFloatingTask(String id);
+
+  Future<void> toggleFloatingTaskCompletion({
+    required String id,
+    required bool completed,
+  });
 }

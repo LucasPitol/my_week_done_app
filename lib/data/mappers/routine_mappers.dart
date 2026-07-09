@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../local/app_database.dart';
 import '../../domain/entities/daily_completion.dart' as domain;
+import '../../domain/entities/floating_task.dart' as domain;
 import '../../domain/entities/routine_block.dart' as domain;
 
 /// Data de referência para horários — só importa hora:minuto.
@@ -80,5 +81,38 @@ DailyCompletionsCompanion dailyCompletionToCompanion(
     date: formatDateKey(completion.date),
     completed: Value(completion.completed),
     note: Value(completion.note),
+  );
+}
+
+String formatTimestamp(DateTime dateTime) => dateTime.toUtc().toIso8601String();
+
+DateTime parseTimestamp(String value) => DateTime.parse(value).toLocal();
+
+domain.FloatingTask floatingTaskFromRow(FloatingTaskRow row) {
+  return domain.FloatingTask(
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    deadline: row.deadline != null ? parseDateKey(row.deadline!) : null,
+    completed: row.completed,
+    completedAt:
+        row.completedAt != null ? parseTimestamp(row.completedAt!) : null,
+    createdAt: parseTimestamp(row.createdAt),
+  );
+}
+
+FloatingTasksCompanion floatingTaskToCompanion(domain.FloatingTask task) {
+  return FloatingTasksCompanion.insert(
+    id: task.id,
+    title: task.title,
+    category: Value(task.category),
+    deadline: Value(
+      task.deadline != null ? formatDateKey(task.deadline!) : null,
+    ),
+    completed: Value(task.completed),
+    completedAt: Value(
+      task.completedAt != null ? formatTimestamp(task.completedAt!) : null,
+    ),
+    createdAt: formatTimestamp(task.createdAt),
   );
 }

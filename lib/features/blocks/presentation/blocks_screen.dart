@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/week_utils.dart';
+import '../../../domain/entities/floating_task.dart';
 import '../../../domain/entities/routine_block.dart';
+import '../../floating_tasks/presentation/widgets/floating_task_list_tile.dart';
+import '../../floating_tasks/providers/floating_task_providers.dart';
 import '../../today/providers/today_providers.dart';
 import '../domain/block_group_utils.dart';
 import '../providers/blocks_providers.dart';
@@ -38,7 +41,15 @@ class BlocksScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _confirmDelete(
+  void _openEditFloatingTask(BuildContext context, FloatingTask task) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BlockFormScreen(floatingTask: task),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteRoutine(
     BuildContext context,
     WidgetRef ref,
     RoutineBlock block,
@@ -92,9 +103,38 @@ class BlocksScreen extends ConsumerWidget {
         );
   }
 
+  Future<void> _confirmDeleteFloatingTask(
+    BuildContext context,
+    WidgetRef ref,
+    FloatingTask task,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir tarefa?'),
+        content: Text('A tarefa "${task.title}" será removida.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    await ref.read(floatingTaskActionsProvider).deleteTask(task.id);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final blocksAsync = ref.watch(routineBlocksProvider);
+    final floatingTasksAsync = ref.watch(floatingTasksProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -105,36 +145,109 @@ class BlocksScreen extends ConsumerWidget {
         error: (error, _) => Center(child: Text('Erro ao carregar: $error')),
         skipLoadingOnReload: true,
         data: (blocks) {
-          if (blocks.isEmpty) {
-            return EmptyBlocksState(onCreate: () => _openCreateForm(context));
-          }
+          return floatingTasksAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) =>
+                Center(child: Text('Erro ao carregar tarefas: $error')),
+            skipLoadingOnReload: true,
+            data: (floatingTasks) {
+              if (blocks.isEmpty && floatingTasks.isEmpty) {
+                return EmptyBlocksState(onCreate: () => _openCreateForm(context));
+              }
 
-          final grouped = blocksGroupedByWeekday(blocks);
+              final grouped = blocksGroupedByWeekday(blocks);
+              final pendingTasks = pendingFloatingTasks(floatingTasks);
+              final completedTasks = completedFloatingTasks(floatingTasks);
 
-          return ListView(
-            padding: const EdgeInsets.only(bottom: 24),
-            children: [
-              for (final weekday in grouped.keys.toList()..sort())
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              return ListView(
+                padding: const EdgeInsets.only(bottom: 24),
+                children: [
+                  if (blocks.isNotEmpty)
+                    for (final weekday in grouped.keys.toList()..sort())
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                            child: Text(
+                              weekdayFullLabels[weekday]!,
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                          ),
+                          for (final block in grouped[weekday]!)
+                            BlockListTile(
+                              block: block,
+                              onTap: () => _openEditForm(context, block),
+                              onDuplicate: () =>
+                                  _openDuplicateForm(context, block),
+                              onDelete: () =>
+                                  _confirmDeleteRoutine(context, ref, block),
+                            ),
+                        ],
+                      )
+                  else
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                       child: Text(
-                        weekdayFullLabels[weekday]!,
-                        style: Theme.of(context).textTheme.titleSmall,
+                        'Nenhuma rotina fixa',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
                       ),
                     ),
-                    for (final block in grouped[weekday]!)
-                      BlockListTile(
-                        block: block,
-                        onTap: () => _openEditForm(context, block),
-                        onDuplicate: () => _openDuplicateForm(context, block),
-                        onDelete: () => _confirmDelete(context, ref, block),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    child: Text(
+                      'Tarefas soltas',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ),
+                  if (pendingTasks.isEmpty && completedTasks.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Nenhuma tarefa solta',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
                       ),
+                    )
+                  else ...[
+                    for (final task in pendingTasks)
+                      FloatingTaskListTile(
+                        task: task,
+                        onTap: () => _openEditFloatingTask(context, task),
+                        onDelete: () =>
+                            _confirmDeleteFloatingTask(context, ref, task),
+                      ),
+                    if (completedTasks.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Text(
+                          'Concluídas',
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                      ),
+                      for (final task in completedTasks)
+                        FloatingTaskListTile(
+                          task: task,
+                          onTap: () => _openEditFloatingTask(context, task),
+                          onDelete: () =>
+                              _confirmDeleteFloatingTask(context, ref, task),
+                        ),
+                    ],
                   ],
-                ),
-            ],
+                ],
+              );
+            },
           );
         },
       ),

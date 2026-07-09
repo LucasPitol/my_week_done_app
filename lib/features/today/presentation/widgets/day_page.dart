@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/routine_proximity.dart';
 import '../../providers/today_providers.dart';
+import '../../../floating_tasks/presentation/widgets/floating_task_tile.dart';
+import '../../../floating_tasks/providers/floating_task_providers.dart';
 import 'day_block_tile.dart';
 
 class DayPage extends ConsumerWidget {
@@ -20,6 +22,7 @@ class DayPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final blocks = ref.watch(dayBlocksProvider(date.weekday));
     final completionsAsync = ref.watch(dayCompletionsProvider(date));
+    final floatingTasks = ref.watch(visibleFloatingTasksProvider(date));
     final now = ref.watch(nowProvider).valueOrNull ?? DateTime.now();
 
     return completionsAsync.when(
@@ -91,15 +94,28 @@ class DayPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Nenhuma tarefa solta',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+            if (floatingTasks.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Nenhuma tarefa solta',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              )
+            else
+              ...floatingTasks.map(
+                (task) => FloatingTaskTile(
+                  task: task,
+                  viewDate: date,
+                  onToggle: () => toggleFloatingTaskCompletion(
+                    ref,
+                    id: task.id,
+                    completed: !task.completed,
+                  ),
                 ),
               ),
-            ),
           ],
         );
       },

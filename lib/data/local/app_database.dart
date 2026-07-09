@@ -3,11 +3,12 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import 'tables/daily_completions_table.dart';
+import 'tables/floating_tasks_table.dart';
 import 'tables/routine_blocks_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [RoutineBlocks, DailyCompletions])
+@DriftDatabase(tables: [RoutineBlocks, DailyCompletions, FloatingTasks])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
       : super(executor ?? driftDatabase(name: 'my_week_done'));
@@ -15,7 +16,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -23,6 +24,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await migrator.addColumn(routineBlocks, routineBlocks.groupId);
             await _backfillRoutineBlockGroups();
+          }
+          if (from < 3) {
+            await migrator.createTable(floatingTasks);
           }
         },
         beforeOpen: (details) async {

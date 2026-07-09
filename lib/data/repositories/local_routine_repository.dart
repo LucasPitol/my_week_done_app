@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/daily_completion.dart';
+import '../../domain/entities/floating_task.dart';
 import '../../domain/entities/routine_block.dart';
 import '../../domain/repositories/routine_repository.dart';
 import '../local/app_database.dart';
@@ -160,5 +161,48 @@ class LocalRoutineRepository implements RoutineRepository {
 
     if (total == 0) return 0;
     return done / total;
+  }
+
+  @override
+  Stream<List<FloatingTask>> watchFloatingTasks() {
+    return (_db.select(_db.floatingTasks)
+          ..orderBy([
+            (t) => OrderingTerm.asc(t.createdAt),
+          ]))
+        .watch()
+        .map((rows) => rows.map(floatingTaskFromRow).toList(growable: false));
+  }
+
+  @override
+  Future<void> saveFloatingTask(FloatingTask task) async {
+    await _db.into(_db.floatingTasks).insertOnConflictUpdate(
+          floatingTaskToCompanion(task),
+        );
+  }
+
+  @override
+  Future<void> deleteFloatingTask(String id) async {
+    await (_db.delete(_db.floatingTasks)..where((t) => t.id.equals(id))).go();
+  }
+
+  @override
+  Future<void> toggleFloatingTaskCompletion({
+    required String id,
+    required bool completed,
+  }) async {
+    final existing = await (_db.select(_db.floatingTasks)
+          ..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+
+    if (existing == null) return;
+
+    await (_db.update(_db.floatingTasks)..where((t) => t.id.equals(id))).write(
+      FloatingTasksCompanion(
+        completed: Value(completed),
+        completedAt: Value(
+          completed ? formatTimestamp(DateTime.now()) : null,
+        ),
+      ),
+    );
   }
 }

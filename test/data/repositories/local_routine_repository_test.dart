@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:my_week_done_app/data/local/app_database.dart';
 import 'package:my_week_done_app/data/repositories/local_routine_repository.dart';
+import 'package:my_week_done_app/domain/entities/floating_task.dart';
 import 'package:my_week_done_app/domain/entities/routine_block.dart';
 
 void main() {
@@ -221,6 +222,105 @@ void main() {
 
       expect(completions, hasLength(1));
       expect(completions.first.completed, isTrue);
+    });
+  });
+
+  group('floating_tasks', () {
+    test('salva e observa tarefas soltas', () async {
+      final task = FloatingTask(
+        id: 'task-1',
+        title: 'Comprar presente',
+        category: 'lazer',
+        deadline: DateTime(2026, 7, 10),
+        completed: false,
+        createdAt: DateTime(2026, 7, 7, 10),
+      );
+
+      await repository.saveFloatingTask(task);
+
+      final tasks = await repository.watchFloatingTasks().first;
+      expect(tasks, hasLength(1));
+      expect(tasks.first.id, 'task-1');
+      expect(tasks.first.title, 'Comprar presente');
+      expect(tasks.first.category, 'lazer');
+      expect(tasks.first.deadline?.day, 10);
+      expect(tasks.first.completed, isFalse);
+    });
+
+    test('alterna conclusão e registra completedAt', () async {
+      await repository.saveFloatingTask(
+        FloatingTask(
+          id: 'task-1',
+          title: 'Ligar pro banco',
+          completed: false,
+          createdAt: DateTime(2026, 7, 7),
+        ),
+      );
+
+      await repository.toggleFloatingTaskCompletion(
+        id: 'task-1',
+        completed: true,
+      );
+
+      final tasks = await repository.watchFloatingTasks().first;
+      expect(tasks.first.completed, isTrue);
+      expect(tasks.first.completedAt, isNotNull);
+
+      await repository.toggleFloatingTaskCompletion(
+        id: 'task-1',
+        completed: false,
+      );
+
+      final updated = await repository.watchFloatingTasks().first;
+      expect(updated.first.completed, isFalse);
+      expect(updated.first.completedAt, isNull);
+    });
+
+    test('exclui tarefa solta', () async {
+      await repository.saveFloatingTask(
+        FloatingTask(
+          id: 'task-1',
+          title: 'Temporária',
+          completed: false,
+          createdAt: DateTime(2026, 7, 7),
+        ),
+      );
+
+      await repository.deleteFloatingTask('task-1');
+
+      final tasks = await repository.watchFloatingTasks().first;
+      expect(tasks, isEmpty);
+    });
+
+    test('não entra no cálculo de aderência', () async {
+      await repository.saveRoutineBlock(
+        RoutineBlock(
+          id: 'block-1',
+          weekday: 1,
+          startTime: DateTime(2000, 1, 1, 7),
+          title: 'Treino',
+        ),
+      );
+
+      await repository.saveFloatingTask(
+        FloatingTask(
+          id: 'task-1',
+          title: 'Tarefa avulsa',
+          completed: true,
+          completedAt: DateTime(2026, 7, 7),
+          createdAt: DateTime(2026, 7, 7),
+        ),
+      );
+
+      final weekStart = DateTime(2026, 7, 6);
+      await repository.toggleCompletion(
+        routineBlockId: 'block-1',
+        date: weekStart,
+        completed: true,
+      );
+
+      final adherence = await repository.adherenceForWeek(weekStart);
+      expect(adherence, 1.0);
     });
   });
 }

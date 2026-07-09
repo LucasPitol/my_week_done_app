@@ -780,6 +780,477 @@ class DailyCompletionsCompanion extends UpdateCompanion<DailyCompletionRow> {
   }
 }
 
+class $FloatingTasksTable extends FloatingTasks
+    with TableInfo<$FloatingTasksTable, FloatingTaskRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FloatingTasksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deadlineMeta = const VerificationMeta(
+    'deadline',
+  );
+  @override
+  late final GeneratedColumn<String> deadline = GeneratedColumn<String>(
+    'deadline',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _completedMeta = const VerificationMeta(
+    'completed',
+  );
+  @override
+  late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
+    'completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  @override
+  late final GeneratedColumn<String> completedAt = GeneratedColumn<String>(
+    'completed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    category,
+    deadline,
+    completed,
+    completedAt,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'floating_tasks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FloatingTaskRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
+    if (data.containsKey('deadline')) {
+      context.handle(
+        _deadlineMeta,
+        deadline.isAcceptableOrUnknown(data['deadline']!, _deadlineMeta),
+      );
+    }
+    if (data.containsKey('completed')) {
+      context.handle(
+        _completedMeta,
+        completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
+      );
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FloatingTaskRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FloatingTaskRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      ),
+      deadline: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deadline'],
+      ),
+      completed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}completed'],
+      )!,
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}completed_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FloatingTasksTable createAlias(String alias) {
+    return $FloatingTasksTable(attachedDatabase, alias);
+  }
+}
+
+class FloatingTaskRow extends DataClass implements Insertable<FloatingTaskRow> {
+  final String id;
+  final String title;
+  final String? category;
+  final String? deadline;
+  final bool completed;
+  final String? completedAt;
+  final String createdAt;
+  const FloatingTaskRow({
+    required this.id,
+    required this.title,
+    this.category,
+    this.deadline,
+    required this.completed,
+    this.completedAt,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || category != null) {
+      map['category'] = Variable<String>(category);
+    }
+    if (!nullToAbsent || deadline != null) {
+      map['deadline'] = Variable<String>(deadline);
+    }
+    map['completed'] = Variable<bool>(completed);
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<String>(completedAt);
+    }
+    map['created_at'] = Variable<String>(createdAt);
+    return map;
+  }
+
+  FloatingTasksCompanion toCompanion(bool nullToAbsent) {
+    return FloatingTasksCompanion(
+      id: Value(id),
+      title: Value(title),
+      category: category == null && nullToAbsent
+          ? const Value.absent()
+          : Value(category),
+      deadline: deadline == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deadline),
+      completed: Value(completed),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FloatingTaskRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FloatingTaskRow(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      category: serializer.fromJson<String?>(json['category']),
+      deadline: serializer.fromJson<String?>(json['deadline']),
+      completed: serializer.fromJson<bool>(json['completed']),
+      completedAt: serializer.fromJson<String?>(json['completedAt']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'category': serializer.toJson<String?>(category),
+      'deadline': serializer.toJson<String?>(deadline),
+      'completed': serializer.toJson<bool>(completed),
+      'completedAt': serializer.toJson<String?>(completedAt),
+      'createdAt': serializer.toJson<String>(createdAt),
+    };
+  }
+
+  FloatingTaskRow copyWith({
+    String? id,
+    String? title,
+    Value<String?> category = const Value.absent(),
+    Value<String?> deadline = const Value.absent(),
+    bool? completed,
+    Value<String?> completedAt = const Value.absent(),
+    String? createdAt,
+  }) => FloatingTaskRow(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    category: category.present ? category.value : this.category,
+    deadline: deadline.present ? deadline.value : this.deadline,
+    completed: completed ?? this.completed,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  FloatingTaskRow copyWithCompanion(FloatingTasksCompanion data) {
+    return FloatingTaskRow(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      category: data.category.present ? data.category.value : this.category,
+      deadline: data.deadline.present ? data.deadline.value : this.deadline,
+      completed: data.completed.present ? data.completed.value : this.completed,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FloatingTaskRow(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('category: $category, ')
+          ..write('deadline: $deadline, ')
+          ..write('completed: $completed, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    category,
+    deadline,
+    completed,
+    completedAt,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FloatingTaskRow &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.category == this.category &&
+          other.deadline == this.deadline &&
+          other.completed == this.completed &&
+          other.completedAt == this.completedAt &&
+          other.createdAt == this.createdAt);
+}
+
+class FloatingTasksCompanion extends UpdateCompanion<FloatingTaskRow> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String?> category;
+  final Value<String?> deadline;
+  final Value<bool> completed;
+  final Value<String?> completedAt;
+  final Value<String> createdAt;
+  final Value<int> rowid;
+  const FloatingTasksCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.category = const Value.absent(),
+    this.deadline = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FloatingTasksCompanion.insert({
+    required String id,
+    required String title,
+    this.category = const Value.absent(),
+    this.deadline = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    required String createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       createdAt = Value(createdAt);
+  static Insertable<FloatingTaskRow> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? category,
+    Expression<String>? deadline,
+    Expression<bool>? completed,
+    Expression<String>? completedAt,
+    Expression<String>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (category != null) 'category': category,
+      if (deadline != null) 'deadline': deadline,
+      if (completed != null) 'completed': completed,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FloatingTasksCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<String?>? category,
+    Value<String?>? deadline,
+    Value<bool>? completed,
+    Value<String?>? completedAt,
+    Value<String>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return FloatingTasksCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      category: category ?? this.category,
+      deadline: deadline ?? this.deadline,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (deadline.present) {
+      map['deadline'] = Variable<String>(deadline.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<bool>(completed.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<String>(completedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FloatingTasksCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('category: $category, ')
+          ..write('deadline: $deadline, ')
+          ..write('completed: $completed, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -787,6 +1258,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DailyCompletionsTable dailyCompletions = $DailyCompletionsTable(
     this,
   );
+  late final $FloatingTasksTable floatingTasks = $FloatingTasksTable(this);
   late final Index idxCompletionBlockDate = Index(
     'idx_completion_block_date',
     'CREATE UNIQUE INDEX idx_completion_block_date ON daily_completions (routine_block_id, date)',
@@ -798,6 +1270,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     routineBlocks,
     dailyCompletions,
+    floatingTasks,
     idxCompletionBlockDate,
   ];
   @override
@@ -1474,6 +1947,246 @@ typedef $$DailyCompletionsTableProcessedTableManager =
       DailyCompletionRow,
       PrefetchHooks Function({bool routineBlockId})
     >;
+typedef $$FloatingTasksTableCreateCompanionBuilder =
+    FloatingTasksCompanion Function({
+      required String id,
+      required String title,
+      Value<String?> category,
+      Value<String?> deadline,
+      Value<bool> completed,
+      Value<String?> completedAt,
+      required String createdAt,
+      Value<int> rowid,
+    });
+typedef $$FloatingTasksTableUpdateCompanionBuilder =
+    FloatingTasksCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<String?> category,
+      Value<String?> deadline,
+      Value<bool> completed,
+      Value<String?> completedAt,
+      Value<String> createdAt,
+      Value<int> rowid,
+    });
+
+class $$FloatingTasksTableFilterComposer
+    extends Composer<_$AppDatabase, $FloatingTasksTable> {
+  $$FloatingTasksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deadline => $composableBuilder(
+    column: $table.deadline,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FloatingTasksTableOrderingComposer
+    extends Composer<_$AppDatabase, $FloatingTasksTable> {
+  $$FloatingTasksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deadline => $composableBuilder(
+    column: $table.deadline,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FloatingTasksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FloatingTasksTable> {
+  $$FloatingTasksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get deadline =>
+      $composableBuilder(column: $table.deadline, builder: (column) => column);
+
+  GeneratedColumn<bool> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  GeneratedColumn<String> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$FloatingTasksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FloatingTasksTable,
+          FloatingTaskRow,
+          $$FloatingTasksTableFilterComposer,
+          $$FloatingTasksTableOrderingComposer,
+          $$FloatingTasksTableAnnotationComposer,
+          $$FloatingTasksTableCreateCompanionBuilder,
+          $$FloatingTasksTableUpdateCompanionBuilder,
+          (
+            FloatingTaskRow,
+            BaseReferences<_$AppDatabase, $FloatingTasksTable, FloatingTaskRow>,
+          ),
+          FloatingTaskRow,
+          PrefetchHooks Function()
+        > {
+  $$FloatingTasksTableTableManager(_$AppDatabase db, $FloatingTasksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FloatingTasksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FloatingTasksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FloatingTasksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> category = const Value.absent(),
+                Value<String?> deadline = const Value.absent(),
+                Value<bool> completed = const Value.absent(),
+                Value<String?> completedAt = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FloatingTasksCompanion(
+                id: id,
+                title: title,
+                category: category,
+                deadline: deadline,
+                completed: completed,
+                completedAt: completedAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                Value<String?> category = const Value.absent(),
+                Value<String?> deadline = const Value.absent(),
+                Value<bool> completed = const Value.absent(),
+                Value<String?> completedAt = const Value.absent(),
+                required String createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FloatingTasksCompanion.insert(
+                id: id,
+                title: title,
+                category: category,
+                deadline: deadline,
+                completed: completed,
+                completedAt: completedAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FloatingTasksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FloatingTasksTable,
+      FloatingTaskRow,
+      $$FloatingTasksTableFilterComposer,
+      $$FloatingTasksTableOrderingComposer,
+      $$FloatingTasksTableAnnotationComposer,
+      $$FloatingTasksTableCreateCompanionBuilder,
+      $$FloatingTasksTableUpdateCompanionBuilder,
+      (
+        FloatingTaskRow,
+        BaseReferences<_$AppDatabase, $FloatingTasksTable, FloatingTaskRow>,
+      ),
+      FloatingTaskRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1482,4 +2195,6 @@ class $AppDatabaseManager {
       $$RoutineBlocksTableTableManager(_db, _db.routineBlocks);
   $$DailyCompletionsTableTableManager get dailyCompletions =>
       $$DailyCompletionsTableTableManager(_db, _db.dailyCompletions);
+  $$FloatingTasksTableTableManager get floatingTasks =>
+      $$FloatingTasksTableTableManager(_db, _db.floatingTasks);
 }
