@@ -9,7 +9,9 @@ lib/
 ├── app/                    # App root e shell de navegação
 ├── core/                   # Tema, constantes
 ├── data/
-│   └── repositories/       # Implementações (LocalRoutineRepository v1)
+│   ├── local/              # AppDatabase (Drift/SQLite)
+│   ├── mappers/            # Conversão domínio ↔ banco
+│   └── repositories/       # LocalRoutineRepository
 ├── domain/
 │   ├── entities/           # RoutineBlock, DailyCompletion
 │   └── repositories/       # Interface RoutineRepository
@@ -25,7 +27,7 @@ lib/
 
 - **Flutter** + **Riverpod** para estado
 - **Repository pattern** — UI desacoplada do storage (local hoje, Supabase no futuro)
-- **LocalRoutineRepository** em memória (v1); migrar para Drift/SQLite depois
+- **LocalRoutineRepository** com SQLite via Drift (persistência local v1)
 
 ## Rodar
 

@@ -15,12 +15,18 @@ dependencies:
   uuid: ^4.5.1
   flutter_tabler_icons: ^1.43.0
   google_fonts: ^6.2.1
+  drift: ^2.34.1
+  drift_flutter: ^0.3.0
+  sqlite3_flutter_libs: ^0.6.0+eol
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
+  drift_dev: ^2.34.0
+  build_runner: ^2.15.1
 
 flutter_launcher_icons:
   android: true

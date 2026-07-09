@@ -6,6 +6,8 @@ abstract class RoutineRepository {
 
   Stream<List<DailyCompletion>> watchCompletionsForDate(DateTime date);
 
+  Stream<List<DailyCompletion>> watchCompletionsForWeek(DateTime weekStart);
+
   Future<void> saveRoutineBlock(RoutineBlock block);
 
   Future<void> deleteRoutineBlock(String id);
