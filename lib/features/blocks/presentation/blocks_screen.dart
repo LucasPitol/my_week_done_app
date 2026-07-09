@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 class BlocksScreen extends StatelessWidget {
   const BlocksScreen({super.key});
@@ -11,7 +12,7 @@ class BlocksScreen extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.add),
+            icon: const Icon(TablerIcons.plus),
             tooltip: 'Criar bloco',
           ),
         ],

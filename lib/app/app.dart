@@ -13,6 +13,7 @@ class MyWeekDoneApp extends StatelessWidget {
       title: AppConstants.appName,
       theme: AppTheme.light(),
       home: const MainShell(),
+      showSemanticsDebugger: false,
     );
   }
 }

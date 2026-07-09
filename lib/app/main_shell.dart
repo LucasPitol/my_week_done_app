@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../features/blocks/presentation/blocks_screen.dart';
@@ -35,18 +36,18 @@ class _MainShellState extends State<MainShell> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.today_outlined),
-            selectedIcon: Icon(Icons.today),
+            icon: Icon(TablerIcons.calendar_week),
+            selectedIcon: Icon(TablerIcons.calendar_event),
             label: 'Hoje',
           ),
           NavigationDestination(
-            icon: Icon(Icons.view_list_outlined),
-            selectedIcon: Icon(Icons.view_list),
+            icon: Icon(TablerIcons.list_details),
+            selectedIcon: Icon(TablerIcons.list),
             label: 'Blocos',
           ),
           NavigationDestination(
-            icon: Icon(Icons.insights_outlined),
-            selectedIcon: Icon(Icons.insights),
+            icon: Icon(TablerIcons.chart_pie),
+            selectedIcon: Icon(TablerIcons.chart_pie_filled),
             label: 'Stats',
           ),
         ],

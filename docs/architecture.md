@@ -18,3 +18,4 @@ Trocar Local → Supabase sem tocar em telaProvider de repositório é injetado 
 Tela principal reage a mudança de dado (toggle de conclusão)AsyncNotifierProvider ou StreamProvider cobre local (Drift stream de query) e futuro Supabase realtime com o mesmo padrão;
 Testar repository isoladoProviders são facilmente sobrescritos em teste (ProviderScope(overrides: [...])), sem precisar de container global;
 Simplicidade pro escopo do MVP (3 telas)Não exige boilerplate de Bloc (events/states separados) nem acopla rotas como o GetX
+
