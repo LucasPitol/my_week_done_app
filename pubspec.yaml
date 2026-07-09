@@ -19,6 +19,7 @@ dependencies:
   drift_flutter: ^0.3.0
   sqlite3_flutter_libs: ^0.6.0+eol
   path: ^1.9.1
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

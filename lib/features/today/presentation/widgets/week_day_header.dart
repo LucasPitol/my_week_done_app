@@ -8,12 +8,14 @@ class WeekDayHeader extends StatelessWidget {
     super.key,
     required this.weekDays,
     required this.today,
+    required this.focusedDate,
     required this.dayColumnWidth,
     required this.timeColumnWidth,
   });
 
   final List<DateTime> weekDays;
   final DateTime today;
+  final DateTime focusedDate;
   final double dayColumnWidth;
   final double timeColumnWidth;
 
@@ -35,28 +37,39 @@ class WeekDayHeader extends StatelessWidget {
         ),
         ...weekDays.map((day) {
           final isToday = isSameDay(day, today);
+          final isFocused = isSameDay(day, focusedDate);
+
           return Container(
             width: dayColumnWidth,
             margin: const EdgeInsets.symmetric(horizontal: 2),
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: isToday
+              color: isFocused
                   ? theme.colorScheme.primary.withValues(alpha: 0.12)
-                  : Colors.transparent,
+                  : isToday
+                      ? theme.colorScheme.secondaryContainer
+                          .withValues(alpha: 0.35)
+                      : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
-              border: isToday
+              border: isFocused
                   ? Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                      width: 1.5,
                     )
-                  : null,
+                  : isToday
+                      ? Border.all(
+                          color: theme.colorScheme.outlineVariant,
+                        )
+                      : null,
             ),
             child: Column(
               children: [
                 Text(
                   dayFormatter.format(day).replaceAll('.', ''),
                   style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
-                    color: isToday
+                    fontWeight:
+                        isFocused || isToday ? FontWeight.w700 : FontWeight.w500,
+                    color: isFocused
                         ? theme.colorScheme.primary
                         : theme.colorScheme.onSurface,
                   ),
@@ -66,7 +79,7 @@ class WeekDayHeader extends StatelessWidget {
                 Text(
                   dateFormatter.format(day),
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: isToday
+                    color: isFocused
                         ? theme.colorScheme.primary
                         : theme.colorScheme.onSurfaceVariant,
                   ),

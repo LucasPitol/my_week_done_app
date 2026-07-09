@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_week_done_app/app/app.dart';
 import 'package:my_week_done_app/data/local/app_database.dart';
@@ -14,6 +15,7 @@ import 'package:my_week_done_app/providers/repository_providers.dart';
 void main() {
   setUpAll(() async {
     GoogleFonts.config.allowRuntimeFetching = false;
+    SharedPreferences.setMockInitialValues({});
     await initializeDateFormatting('pt_BR');
   });
 
@@ -35,7 +37,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
   }
 
-  testWidgets('App inicia na aba Hoje com grid semanal', (WidgetTester tester) async {
+  testWidgets('App inicia na visão Dia por padrão', (WidgetTester tester) async {
     final database = AppDatabase.forTesting(NativeDatabase.memory());
     final repository = LocalRoutineRepository(database);
 
@@ -50,10 +52,37 @@ void main() {
 
     await pumpApp(tester, database: database, repository: repository);
 
+    expect(find.text('Treino'), findsOneWidget);
+    expect(find.text('Hoje'), findsWidgets);
+    expect(find.text('Dia'), findsOneWidget);
+    expect(find.text('Calendário'), findsOneWidget);
+    expect(find.text('Tarefas soltas'), findsOneWidget);
+    expect(find.text('Hora'), findsNothing);
+
+    await database.close();
+  });
+
+  testWidgets('Toggle alterna para visão Calendário', (WidgetTester tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    final repository = LocalRoutineRepository(database);
+
+    await repository.saveRoutineBlock(
+      RoutineBlock(
+        id: 'treino',
+        weekday: DateTime.now().weekday,
+        startTime: DateTime(2000, 1, 1, 7),
+        title: 'Treino',
+      ),
+    );
+
+    await pumpApp(tester, database: database, repository: repository);
+
+    await tester.tap(find.text('Calendário'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
     expect(find.text('Hora'), findsOneWidget);
     expect(find.text('Treino'), findsOneWidget);
-    expect(find.text('Blocos'), findsWidgets);
-    expect(find.text('Stats'), findsWidgets);
 
     await database.close();
   });

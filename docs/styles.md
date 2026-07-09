@@ -1,7 +1,49 @@
 # Guia de Estilo — My Week Done
-## Aplicação moderada do Liquid Glass (iOS 26 / tendência 2026)
 
----
+## Paleta de cores
+
+## Paleta de cores
+
+Base dark-first com neutros elevados (tingidos de verde, não preto/cinza puro) — reduz fadiga visual em app de uso repetido ao longo do dia, e reforça a identidade "crescimento/constância" do verde já usado no protótipo.
+
+### Dark mode (padrão)
+
+| Papel | Hex |
+|---|---|
+| Fundo base | `#0B0F0D` |
+| Superfície (cards) | `#151A17` |
+| Superfície elevada (sheets, glass) | `#1D2420` |
+| Borda sutil | `#2A322D` |
+| Texto primário | `#EDECE6` |
+| Texto secundário | `#9AA39C` |
+
+### Acentos (uso restrito, ~10% da tela)
+
+| Papel | Hex | Uso |
+|---|---|---|
+| Primário (conclusão, anel de aderência, dia ativo) | `#6FCF97` | Reforço positivo de hábito cumprido |
+| Urgência (prazo vencido) | `#E8846E` | Tarefas soltas atrasadas |
+| Aviso (prazo próximo) | `#E8B86E` | Estado intermediário, não urgente |
+
+### Light mode (secundário)
+
+| Papel | Hex |
+|---|---|
+| Fundo base | `#F5F2EA` |
+| Superfície | `#FBFAF6` |
+| Borda | `#E2DDD1` |
+| Texto primário | `#1C201D` |
+| Acento primário | `#3F9463` |
+
+### Regra de uso
+60% fundo/superfícies neutras · 30% texto/bordas · 10% acentos (primário, urgência, aviso) — nunca os três acentos juntos na mesma tela.
+
+### Aplicação no Liquid Glass
+Tint das camadas de glass (tab bar, botão flutuante, bottom sheet) usa o acento primário `#6FCF97` a ~10–15% de opacidade sobre o blur, em vez de branco genérico, mantendo a identidade de cor mesmo nas camadas translúcidas.
+
+--
+
+## Aplicação moderada do Liquid Glass (iOS 26 / tendência 2026)
 
 ## 1. Princípio central: glass é para navegação, não para conteúdo
 

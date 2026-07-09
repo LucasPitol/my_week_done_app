@@ -13,10 +13,12 @@ class WeekGrid extends ConsumerWidget {
     super.key,
     required this.weekStart,
     required this.today,
+    required this.focusedDate,
   });
 
   final DateTime weekStart;
   final DateTime today;
+  final DateTime focusedDate;
 
   static const timeColumnWidth = 52.0;
   static const dayColumnWidth = 72.0;
@@ -42,6 +44,7 @@ class WeekGrid extends ConsumerWidget {
           completions: completions,
           weekStart: weekStart,
           today: today,
+          focusedDate: focusedDate,
           onToggle: (block, date, completed) => toggleBlockCompletion(
             ref,
             routineBlockId: block.id,
@@ -61,6 +64,7 @@ class _WeekGridBody extends StatelessWidget {
     required this.completions,
     required this.weekStart,
     required this.today,
+    required this.focusedDate,
     required this.onToggle,
   });
 
@@ -69,6 +73,7 @@ class _WeekGridBody extends StatelessWidget {
   final List<DailyCompletion> completions;
   final DateTime weekStart;
   final DateTime today;
+  final DateTime focusedDate;
   final Future<void> Function(
     RoutineBlock block,
     DateTime date,
@@ -92,6 +97,7 @@ class _WeekGridBody extends StatelessWidget {
             child: WeekDayHeader(
               weekDays: weekDays,
               today: today,
+              focusedDate: focusedDate,
               dayColumnWidth: WeekGrid.dayColumnWidth,
               timeColumnWidth: WeekGrid.timeColumnWidth,
             ),
@@ -114,6 +120,7 @@ class _WeekGridBody extends StatelessWidget {
                               weekDays: weekDays,
                               blocks: blocks,
                               today: today,
+                              focusedDate: focusedDate,
                               completionLookup: completionLookup,
                               onToggle: onToggle,
                             ),
@@ -134,6 +141,7 @@ class _HourRow extends StatelessWidget {
     required this.weekDays,
     required this.blocks,
     required this.today,
+    required this.focusedDate,
     required this.completionLookup,
     required this.onToggle,
   });
@@ -142,6 +150,7 @@ class _HourRow extends StatelessWidget {
   final List<DateTime> weekDays;
   final List<RoutineBlock> blocks;
   final DateTime today;
+  final DateTime focusedDate;
   final Map<String, DailyCompletion> completionLookup;
   final Future<void> Function(
     RoutineBlock block,
@@ -177,6 +186,7 @@ class _HourRow extends StatelessWidget {
             width: WeekGrid.dayColumnWidth,
             height: WeekGrid.rowHeight,
             isTodayColumn: isSameDay(day, today),
+            isFocusedColumn: isSameDay(day, focusedDate),
             blocks: blocks
                 .where(
                   (block) =>

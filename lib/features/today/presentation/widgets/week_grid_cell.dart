@@ -11,6 +11,7 @@ class WeekGridCell extends StatelessWidget {
     required this.isCompleted,
     required this.onToggle,
     required this.isTodayColumn,
+    required this.isFocusedColumn,
     required this.width,
     required this.height,
   });
@@ -19,15 +20,18 @@ class WeekGridCell extends StatelessWidget {
   final bool Function(RoutineBlock block) isCompleted;
   final Future<void> Function(RoutineBlock block, bool completed) onToggle;
   final bool isTodayColumn;
+  final bool isFocusedColumn;
   final double width;
   final double height;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final todayTint = isTodayColumn
-        ? theme.colorScheme.primary.withValues(alpha: 0.04)
-        : Colors.transparent;
+    final todayTint = isFocusedColumn
+        ? theme.colorScheme.primary.withValues(alpha: 0.06)
+        : isTodayColumn
+            ? theme.colorScheme.primary.withValues(alpha: 0.03)
+            : Colors.transparent;
 
     return Container(
       width: width,
