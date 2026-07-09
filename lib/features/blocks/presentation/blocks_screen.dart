@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/utils/week_utils.dart';
 import '../../../domain/entities/routine_block.dart';
@@ -45,8 +44,8 @@ class BlocksScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Excluir bloco?'),
-        content: Text('O bloco "${block.title}" será removido da sua rotina.'),
+        title: const Text('Excluir rotina?'),
+        content: Text('A rotina "${block.title}" será removida.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -71,14 +70,7 @@ class BlocksScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Blocos'),
-        actions: [
-          IconButton(
-            onPressed: () => _openCreateForm(context),
-            icon: const Icon(TablerIcons.plus),
-            tooltip: 'Criar bloco',
-          ),
-        ],
+        title: const Text('Minhas rotinas'),
       ),
       body: blocksAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -117,16 +109,6 @@ class BlocksScreen extends ConsumerWidget {
             ],
           );
         },
-      ),
-      floatingActionButton: blocksAsync.maybeWhen(
-        data: (blocks) => blocks.isNotEmpty
-            ? FloatingActionButton(
-                onPressed: () => _openCreateForm(context),
-                tooltip: 'Novo bloco',
-                child: const Icon(TablerIcons.plus),
-              )
-            : null,
-        orElse: () => null,
       ),
     );
   }

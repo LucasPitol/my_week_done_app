@@ -122,9 +122,9 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Excluir bloco?'),
+        title: const Text('Excluir rotina?'),
         content: Text(
-          'O bloco "${widget.block!.title}" será removido da sua rotina.',
+          'A rotina "${widget.block!.title}" será removida.',
         ),
         actions: [
           TextButton(
@@ -156,10 +156,10 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
       appBar: AppBar(
         title: Text(
           isEditing
-              ? 'Editar bloco'
+              ? 'Editar rotina'
               : isDuplicating
-                  ? 'Duplicar bloco'
-                  : 'Novo bloco',
+                  ? 'Duplicar rotina'
+                  : 'Nova rotina',
         ),
         actions: [
           if (isEditing)
@@ -178,7 +178,7 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
             TextFormField(
               controller: _titleController,
               decoration: const InputDecoration(
-                labelText: 'Nome do bloco',
+                labelText: 'Nome da rotina',
                 hintText: 'Ex: Treino, Trabalho, Ler',
                 border: OutlineInputBorder(),
               ),
@@ -206,7 +206,7 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
             const SizedBox(height: 4),
             if (!isEditing)
               Text(
-                'Selecione vários dias para criar o mesmo bloco de uma vez.',
+                'Selecione vários dias para criar a mesma rotina de uma vez.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -245,7 +245,7 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(isEditing ? 'Salvar alterações' : 'Criar bloco'),
+                  : Text(isEditing ? 'Salvar alterações' : 'Criar rotina'),
             ),
           ],
         ),

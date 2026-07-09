@@ -26,13 +26,13 @@ class EmptyBlocksState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Nenhum bloco criado',
+              'Nenhuma rotina criada',
               style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Monte sua rotina semanal criando blocos fixos de horário.',
+              'Monte sua rotina semanal com horários fixos que se repetem toda semana.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -42,7 +42,7 @@ class EmptyBlocksState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onCreate,
               icon: const Icon(TablerIcons.plus),
-              label: const Text('Criar primeiro bloco'),
+              label: const Text('Criar primeira rotina'),
             ),
           ],
         ),

@@ -225,13 +225,13 @@ class _EmptyWeekState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Nenhum bloco nesta semana',
+              'Nenhuma rotina nesta semana',
               style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Crie blocos na aba Blocos para montar sua rotina.',
+              'Crie rotinas na aba Rotinas.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

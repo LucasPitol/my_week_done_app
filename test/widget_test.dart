@@ -57,6 +57,7 @@ void main() {
     expect(find.text('Dia'), findsOneWidget);
     expect(find.text('Calendário'), findsOneWidget);
     expect(find.text('Tarefas soltas'), findsOneWidget);
+    expect(find.text('Rotinas'), findsWidgets);
     expect(find.text('Hora'), findsNothing);
 
     await database.close();
@@ -87,7 +88,7 @@ void main() {
     await database.close();
   });
 
-  testWidgets('Tap no bloco alterna conclusão', (WidgetTester tester) async {
+  testWidgets('Tap na rotina alterna conclusão', (WidgetTester tester) async {
     final database = AppDatabase.forTesting(NativeDatabase.memory());
     final repository = LocalRoutineRepository(database);
     final today = DateTime.now();

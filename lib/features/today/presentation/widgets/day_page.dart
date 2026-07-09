@@ -42,13 +42,13 @@ class DayPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Nenhum bloco neste dia',
+                      'Nenhuma rotina neste dia',
                       style: theme.textTheme.titleSmall,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Crie blocos na aba Blocos para montar sua rotina.',
+                      'Crie rotinas na aba Rotinas.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

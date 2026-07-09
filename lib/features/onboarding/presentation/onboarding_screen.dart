@@ -25,7 +25,7 @@ class OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Marque seus blocos de rotina e acompanhe sua constância semana a semana.',
+                'Marque suas rotinas e acompanhe sua constância semana a semana.',
                 textAlign: TextAlign.center,
               ),
               const Spacer(),
