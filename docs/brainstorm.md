@@ -22,6 +22,61 @@ Indicador visual de "hoje" (destaque na coluna do dia atual)
 - % de aderência da semana (blocos concluídos / total esperado)
 - Histórico simples: últimos 7 dias, visual tipo streak
 
+Contexto de dados (já implementado, sem mudança de schema)
+
+routine_blocks: uma linha por (bloco, dia da semana), ligadas por groupId quando criadas em lote
+daily_completions: uma linha por (routine_block_id, data) quando marcado feito; ausência = não feito
+Sem soft delete: excluir bloco remove (cascade) as completions associadas
+
+KPI 1 — Aderência diária
+esperado(data) = COUNT(routine_blocks 
+  WHERE weekday = data.weekday 
+  AND created_at.date <= data)
+
+completado(data) = COUNT(daily_completions 
+  WHERE data = data 
+  AND routine_block_id IN esperado(data))
+
+aderencia_diaria(data) = completado(data) / esperado(data) * 100
+
+Se esperado(data) == 0 → não é "0% de aderência", é "sem rotina neste dia" (estado neutro, não conta como falha em nenhum lugar)
+
+KPI 2 — Aderência semanal (o anel da tela principal)
+Semana = segunda a domingo. Para evitar contar dias futuros que ainda não aconteceram:
+aderencia_semanal = SUM(completado(d)) / SUM(esperado(d))
+  para d em [segunda_da_semana .. hoje]
+  onde esperado(d) > 0
+
+Dias futuros da semana atual (ainda não chegaram) não entram no denominador — senão o anel começa a semana em 0% artificialmente baixo
+Se toda a semana até hoje tiver esperado = 0 (raro, só se não há rotina cadastrada pro período) → exibir estado vazio, não "0%"
+
+KPI 3 — Streak (constância)
+streak = número de dias consecutivos, terminando ONTEM (hoje é excluído do cálculo),
+  onde aderencia_diaria(d) = 100%
+  pulando (sem quebrar) dias onde esperado(d) = 0
+
+Hoje nunca conta pro streak — o dia está em andamento, contar cedo demais criaria falso positivo/negativo. Hoje aparece separado na UI como "em andamento" (ex: "3 de 5 feitos hoje")
+Dia com esperado = 0 (ex: fim de semana sem rotina cadastrada) é transparente pro streak — não soma, mas também não zera
+Qualquer dia com esperado > 0 e aderencia_diaria < 100% zera o streak
+
+KPI 4 — Histórico de 7 dias (visual tipo streak/heatmap)
+Lista os últimos 7 dias corridos (incluindo hoje, mas hoje com indicador de "em andamento")
+Cada dia mostra 1 de 3 estados visuais: completo (100%), parcial (>0% e <100%), sem rotina (esperado = 0) — não usar "falha" como categoria separada de "parcial", pra não punir visualmente 80% de aderência igual a 0%
+
+Nota explícita sobre exclusão de blocos (documentar isso, é importante)
+Excluir um bloco remove suas completions em cascade. Isso significa que o histórico passado pode mudar retroativamente se um bloco antigo for excluído — dias que antes mostravam 100% podem cair, porque o "esperado" daquele dia agora é recalculado sem o bloco excluído. Isso é uma limitação aceita do modelo atual (sem soft delete), não um bug — mas o Composer deve saber disso porque senão pode "corrigir" isso sem avisar, gerando comportamento não previsto.
+Consultas necessárias (visão geral, sem prescrever query exata)
+
+Aderência de um dia específico (usada no dia "hoje" e no histórico de 7 dias)
+Aderência agregada de um intervalo de dias (usada no anel semanal)
+Streak — precisa iterar dia a dia de trás pra frente a partir de ontem até encontrar a primeira quebra
+
+Fora de escopo deste épico
+
+floating_tasks não entram em nenhum dos 4 KPIs acima (decisão já tomada no Épico 5)
+Sem persistência de streak em cache — calcular sob demanda a partir de daily_completions é suficiente pro volume de dados esperado (uso pessoal, não multi-usuário)
+Sem gráfico histórico além de 7 dias neste épico (é o corte de produto já cogitado pra versão paga futura)
+
 ## Épico 5 - Floating tasks
 
 routine_blocks representa recorrência fixa (mesma hora, mesmo(s) dia(s), toda semana). Uma tarefa solta com prazo é o oposto: acontece uma vez, não tem hora fixa, e sua visibilidade muda com o tempo (ela "aparece" nos dias antes do prazo, não só no dia do prazo). Forçar isso na tabela existente ia exigir campos nulos demais e lógica condicional espalhada pela UI. Melhor uma tabela nova, propósito único.

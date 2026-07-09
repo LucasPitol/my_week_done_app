@@ -2,7 +2,7 @@ name: my_week_done_app
 description: "Tracker de rotina fixa recorrente — My Week Done."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ^3.11.1
