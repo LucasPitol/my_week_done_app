@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/constants/app_constants.dart';
+
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({
     super.key,
@@ -19,7 +21,7 @@ class OnboardingScreen extends StatelessWidget {
             children: [
               const Spacer(),
               Text(
-                'My Week Done',
+                AppConstants.appName,
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
