@@ -2,7 +2,7 @@ name: my_week_done_app
 description: "Tracker de rotina fixa recorrente — My Week Done."
 publish_to: 'none'
 
-version: 1.0.0+2
+version: 1.1.1+4
 
 environment:
   sdk: ^3.11.1
@@ -17,9 +17,13 @@ dependencies:
   google_fonts: ^6.2.1
   drift: ^2.34.1
   drift_flutter: ^0.3.0
-  sqlite3_flutter_libs: ^0.6.0+eol
   path: ^1.9.1
   shared_preferences: ^2.5.5
+
+dependency_overrides:
+  # path_provider_foundation 2.6.0+ usa FFI objective_c que falha no simulador iOS.
+  # Ver: https://github.com/flutter/flutter/issues/186794
+  path_provider_foundation: 2.5.1
 
 dev_dependencies:
   flutter_test:

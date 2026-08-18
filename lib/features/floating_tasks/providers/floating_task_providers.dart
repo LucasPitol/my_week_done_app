@@ -93,12 +93,23 @@ List<FloatingTask> pendingFloatingTasks(List<FloatingTask> tasks) {
   return pending;
 }
 
-List<FloatingTask> completedFloatingTasks(List<FloatingTask> tasks) {
-  final completed = tasks.where((task) => task.completed).toList()
+List<FloatingTask> completedFloatingTasks(
+  List<FloatingTask> tasks, {
+  DateTime? reference,
+  bool limitToRecentHistory = false,
+}) {
+  final ref = reference ?? DateTime.now();
+  final completed = tasks
+      .where((task) {
+        if (!task.completed) return false;
+        if (limitToRecentHistory) {
+          return isCompletedFloatingTaskWithinVisibleHistory(task, ref);
+        }
+        return true;
+      })
+      .toList()
     ..sort((a, b) {
-      final aAt = a.completedAt ?? a.createdAt;
-      final bAt = b.completedAt ?? b.createdAt;
-      return bAt.compareTo(aAt);
+      return floatingTaskCompletedAt(b).compareTo(floatingTaskCompletedAt(a));
     });
   return completed;
 }

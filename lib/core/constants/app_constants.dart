@@ -3,5 +3,6 @@ class AppConstants {
 
   static const tabToday = 0;
   static const tabBlocks = 1;
-  static const tabStats = 2;
+  static const tabProfile = 2;
+  // static const tabStats = 2;
 }

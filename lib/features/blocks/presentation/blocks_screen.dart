@@ -157,7 +157,11 @@ class BlocksScreen extends ConsumerWidget {
 
               final grouped = blocksGroupedByWeekday(blocks);
               final pendingTasks = pendingFloatingTasks(floatingTasks);
-              final completedTasks = completedFloatingTasks(floatingTasks);
+              final allCompletedTasks = completedFloatingTasks(floatingTasks);
+              final completedTasks = completedFloatingTasks(
+                floatingTasks,
+                limitToRecentHistory: true,
+              );
 
               return ListView(
                 padding: const EdgeInsets.only(bottom: 24),
@@ -204,7 +208,7 @@ class BlocksScreen extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
-                  if (pendingTasks.isEmpty && completedTasks.isEmpty)
+                  if (pendingTasks.isEmpty && allCompletedTasks.isEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
@@ -224,7 +228,7 @@ class BlocksScreen extends ConsumerWidget {
                         onDelete: () =>
                             _confirmDeleteFloatingTask(context, ref, task),
                       ),
-                    if (completedTasks.isNotEmpty) ...[
+                    if (allCompletedTasks.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                         child: Text(
@@ -243,6 +247,18 @@ class BlocksScreen extends ConsumerWidget {
                           onDelete: () =>
                               _confirmDeleteFloatingTask(context, ref, task),
                         ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                        child: Text(
+                          'Mostrando apenas tarefas concluídas nos últimos 2 meses.',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      ),
                     ],
                   ],
                 ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/category_colors.dart';
 import '../../../../domain/entities/routine_block.dart';
 
 class WeekGridCell extends StatelessWidget {
@@ -73,12 +72,12 @@ class _BlockChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = categoryColor(block.category, theme.colorScheme);
     final background = completed
-        ? color.withValues(alpha: 0.85)
+        ? theme.colorScheme.primary.withValues(alpha: 0.85)
         : theme.colorScheme.surfaceContainerHighest;
-    final foreground =
-        completed ? Colors.white : theme.colorScheme.onSurface;
+    final foreground = completed
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onSurface;
 
     return Padding(
       padding: const EdgeInsets.all(2),

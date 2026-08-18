@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/week_utils.dart';
 import '../../../../domain/entities/daily_completion.dart';
+import '../../../../domain/entities/floating_task.dart';
 import '../../../../domain/entities/routine_block.dart';
+import '../../../floating_tasks/domain/floating_task_visibility.dart';
+import '../../../floating_tasks/providers/floating_task_providers.dart';
 import '../../providers/today_providers.dart';
 import 'week_day_header.dart';
+import 'week_floating_task_chip.dart';
 import 'week_grid_cell.dart';
 
 class WeekGrid extends ConsumerWidget {
@@ -23,6 +27,7 @@ class WeekGrid extends ConsumerWidget {
   static const timeColumnWidth = 52.0;
   static const dayColumnWidth = 72.0;
   static const rowHeight = 68.0;
+  static const floatingTasksRowHeight = 56.0;
 
   static double daysWidth(int dayCount) =>
       (dayColumnWidth + 4) * dayCount;
@@ -35,6 +40,7 @@ class WeekGrid extends ConsumerWidget {
     final theme = Theme.of(context);
     final blocksAsync = ref.watch(routineBlocksProvider);
     final completionsAsync = ref.watch(weekCompletionsProvider);
+    final floatingTasksAsync = ref.watch(floatingTasksProvider);
 
     return blocksAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -44,18 +50,30 @@ class WeekGrid extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('Erro ao carregar: $error')),
         skipLoadingOnReload: true,
-        data: (completions) => _WeekGridBody(
-          theme: theme,
-          blocks: blocks,
-          completions: completions,
-          weekStart: weekStart,
-          today: today,
-          focusedDate: focusedDate,
-          onToggle: (block, date, completed) => toggleBlockCompletion(
-            ref,
-            routineBlockId: block.id,
-            date: date,
-            completed: completed,
+        data: (completions) => floatingTasksAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) =>
+              Center(child: Text('Erro ao carregar tarefas: $error')),
+          skipLoadingOnReload: true,
+          data: (floatingTasks) => _WeekGridBody(
+            theme: theme,
+            blocks: blocks,
+            floatingTasks: floatingTasks,
+            completions: completions,
+            weekStart: weekStart,
+            today: today,
+            focusedDate: focusedDate,
+            onToggle: (block, date, completed) => toggleBlockCompletion(
+              ref,
+              routineBlockId: block.id,
+              date: date,
+              completed: completed,
+            ),
+            onToggleFloatingTask: (task) => toggleFloatingTaskCompletion(
+              ref,
+              id: task.id,
+              completed: !task.completed,
+            ),
           ),
         ),
       ),
@@ -67,15 +85,18 @@ class _WeekGridBody extends StatefulWidget {
   const _WeekGridBody({
     required this.theme,
     required this.blocks,
+    required this.floatingTasks,
     required this.completions,
     required this.weekStart,
     required this.today,
     required this.focusedDate,
     required this.onToggle,
+    required this.onToggleFloatingTask,
   });
 
   final ThemeData theme;
   final List<RoutineBlock> blocks;
+  final List<FloatingTask> floatingTasks;
   final List<DailyCompletion> completions;
   final DateTime weekStart;
   final DateTime today;
@@ -85,6 +106,7 @@ class _WeekGridBody extends StatefulWidget {
     DateTime date,
     bool completed,
   ) onToggle;
+  final Future<void> Function(FloatingTask task) onToggleFloatingTask;
 
   @override
   State<_WeekGridBody> createState() => _WeekGridBodyState();
@@ -92,16 +114,38 @@ class _WeekGridBody extends StatefulWidget {
 
 class _WeekGridBodyState extends State<_WeekGridBody> {
   late final ScrollController _horizontalScrollController;
+  late final ScrollController _headerScrollController;
+  bool _syncingScroll = false;
 
   @override
   void initState() {
     super.initState();
     _horizontalScrollController = ScrollController();
+    _headerScrollController = ScrollController();
+    _horizontalScrollController.addListener(_syncHeaderScroll);
+    _headerScrollController.addListener(_syncGridScroll);
+  }
+
+  void _syncHeaderScroll() {
+    if (_syncingScroll || !_headerScrollController.hasClients) return;
+    _syncingScroll = true;
+    _headerScrollController.jumpTo(_horizontalScrollController.offset);
+    _syncingScroll = false;
+  }
+
+  void _syncGridScroll() {
+    if (_syncingScroll || !_horizontalScrollController.hasClients) return;
+    _syncingScroll = true;
+    _horizontalScrollController.jumpTo(_headerScrollController.offset);
+    _syncingScroll = false;
   }
 
   @override
   void dispose() {
+    _horizontalScrollController.removeListener(_syncHeaderScroll);
+    _headerScrollController.removeListener(_syncGridScroll);
     _horizontalScrollController.dispose();
+    _headerScrollController.dispose();
     super.dispose();
   }
 
@@ -112,6 +156,13 @@ class _WeekGridBodyState extends State<_WeekGridBody> {
     final completionLookup = buildCompletionLookup(widget.completions);
     final daysWidth = WeekGrid.daysWidth(weekDays.length);
     final gridWidth = WeekGrid.gridWidth(weekDays.length);
+    final weekEnd = weekDays.last;
+    final hasFloatingTasksInWeek = hasFloatingTasksDueInRange(
+      widget.floatingTasks,
+      widget.weekStart,
+      weekEnd,
+    );
+    final hasGridContent = widget.blocks.isNotEmpty || hasFloatingTasksInWeek;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,29 +179,19 @@ class _WeekGridBodyState extends State<_WeekGridBody> {
               ),
             ),
             Expanded(
-              child: ClipRect(
-                child: AnimatedBuilder(
-                  animation: _horizontalScrollController,
-                  builder: (context, child) {
-                    final offset = _horizontalScrollController.hasClients
-                        ? _horizontalScrollController.offset
-                        : 0.0;
-
-                    return Transform.translate(
-                      offset: Offset(-offset, 0),
-                      child: child,
-                    );
-                  },
-                  child: SizedBox(
-                    width: daysWidth,
-                    child: WeekDayHeader(
-                      weekDays: weekDays,
-                      today: widget.today,
-                      focusedDate: widget.focusedDate,
-                      dayColumnWidth: WeekGrid.dayColumnWidth,
-                      timeColumnWidth: WeekGrid.timeColumnWidth,
-                      showTimeColumn: false,
-                    ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                controller: _headerScrollController,
+                physics: const NeverScrollableScrollPhysics(),
+                child: SizedBox(
+                  width: daysWidth,
+                  child: WeekDayHeader(
+                    weekDays: weekDays,
+                    today: widget.today,
+                    focusedDate: widget.focusedDate,
+                    dayColumnWidth: WeekGrid.dayColumnWidth,
+                    timeColumnWidth: WeekGrid.timeColumnWidth,
+                    showTimeColumn: false,
                   ),
                 ),
               ),
@@ -159,12 +200,13 @@ class _WeekGridBodyState extends State<_WeekGridBody> {
         ),
         const SizedBox(height: 8),
         Expanded(
-          child: widget.blocks.isEmpty
+          child: !hasGridContent
               ? _EmptyWeekState(theme: widget.theme)
               : SingleChildScrollView(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     controller: _horizontalScrollController,
+                    physics: const ClampingScrollPhysics(),
                     child: SizedBox(
                       width: gridWidth,
                       child: Column(
@@ -178,6 +220,14 @@ class _WeekGridBodyState extends State<_WeekGridBody> {
                               focusedDate: widget.focusedDate,
                               completionLookup: completionLookup,
                               onToggle: widget.onToggle,
+                            ),
+                          if (hasFloatingTasksInWeek)
+                            _FloatingTasksRow(
+                              weekDays: weekDays,
+                              floatingTasks: widget.floatingTasks,
+                              today: widget.today,
+                              focusedDate: widget.focusedDate,
+                              onToggle: widget.onToggleFloatingTask,
                             ),
                         ],
                       ),
@@ -260,6 +310,114 @@ class _HourRow extends StatelessWidget {
   }
 }
 
+class _FloatingTasksRow extends StatelessWidget {
+  const _FloatingTasksRow({
+    required this.weekDays,
+    required this.floatingTasks,
+    required this.today,
+    required this.focusedDate,
+    required this.onToggle,
+  });
+
+  final List<DateTime> weekDays;
+  final List<FloatingTask> floatingTasks;
+  final DateTime today;
+  final DateTime focusedDate;
+  final Future<void> Function(FloatingTask task) onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: WeekGrid.timeColumnWidth,
+          height: WeekGrid.floatingTasksRowHeight,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'Prazo',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+        for (final day in weekDays)
+          _FloatingTasksCell(
+            width: WeekGrid.dayColumnWidth,
+            height: WeekGrid.floatingTasksRowHeight,
+            isTodayColumn: isSameDay(day, today),
+            isFocusedColumn: isSameDay(day, focusedDate),
+            tasks: floatingTasksDueOnDate(floatingTasks, day),
+            viewDate: day,
+            onToggle: onToggle,
+          ),
+      ],
+    );
+  }
+}
+
+class _FloatingTasksCell extends StatelessWidget {
+  const _FloatingTasksCell({
+    required this.width,
+    required this.height,
+    required this.isTodayColumn,
+    required this.isFocusedColumn,
+    required this.tasks,
+    required this.viewDate,
+    required this.onToggle,
+  });
+
+  final double width;
+  final double height;
+  final bool isTodayColumn;
+  final bool isFocusedColumn;
+  final List<FloatingTask> tasks;
+  final DateTime viewDate;
+  final Future<void> Function(FloatingTask task) onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final todayTint = isFocusedColumn
+        ? theme.colorScheme.primary.withValues(alpha: 0.06)
+        : isTodayColumn
+            ? theme.colorScheme.primary.withValues(alpha: 0.03)
+            : Colors.transparent;
+
+    return Container(
+      width: width,
+      height: height,
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+      decoration: BoxDecoration(
+        color: todayTint,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: tasks.isEmpty
+          ? null
+          : Column(
+              children: [
+                for (final task in tasks)
+                  Expanded(
+                    child: WeekFloatingTaskChip(
+                      task: task,
+                      viewDate: viewDate,
+                      onToggle: () => onToggle(task),
+                    ),
+                  ),
+              ],
+            ),
+    );
+  }
+}
+
 class _EmptyWeekState extends StatelessWidget {
   const _EmptyWeekState({required this.theme});
 
@@ -286,7 +444,7 @@ class _EmptyWeekState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Crie rotinas na aba Rotinas.',
+              'Toque no botão + para criar sua primeira rotina.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

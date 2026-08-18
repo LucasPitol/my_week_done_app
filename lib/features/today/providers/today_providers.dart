@@ -6,6 +6,7 @@ import '../../../domain/entities/routine_block.dart';
 import '../../../providers/repository_providers.dart';
 import '../domain/day_index.dart';
 
+export '../domain/completion_utils.dart';
 import '../providers/today_view_providers.dart';
 
 final currentWeekStartProvider = Provider<DateTime>((ref) {
@@ -47,19 +48,6 @@ final nowProvider = StreamProvider<DateTime>((ref) async* {
   yield DateTime.now();
   yield* Stream.periodic(const Duration(seconds: 30), (_) => DateTime.now());
 });
-
-String completionKey(String blockId, DateTime date) {
-  return '$blockId-${date.year}-${date.month}-${date.day}';
-}
-
-Map<String, DailyCompletion> buildCompletionLookup(
-  List<DailyCompletion> completions,
-) {
-  return {
-    for (final completion in completions)
-      completionKey(completion.routineBlockId, completion.date): completion,
-  };
-}
 
 Future<void> toggleBlockCompletion(
   WidgetRef ref, {

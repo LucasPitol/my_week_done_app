@@ -106,4 +106,34 @@ void main() {
       expect(visible.map((t) => t.id).toList(), ['soon', 'later']);
     });
   });
+
+  group('floatingTasksDueOnDate', () {
+    test('retorna tarefas com prazo na data', () {
+      final tasks = [
+        task(id: 'due', deadline: thursday),
+        task(id: 'other-day', deadline: friday),
+        task(id: 'no-deadline'),
+        task(id: 'done', deadline: thursday, completed: true),
+      ];
+
+      final due = floatingTasksDueOnDate(tasks, thursday);
+
+      expect(due.map((t) => t.id).toList(), ['due']);
+    });
+  });
+
+  group('hasFloatingTasksDueInRange', () {
+    test('detecta prazo dentro do intervalo', () {
+      final tasks = [task(deadline: thursday)];
+
+      expect(
+        hasFloatingTasksDueInRange(tasks, tuesday, friday),
+        isTrue,
+      );
+      expect(
+        hasFloatingTasksDueInRange(tasks, friday, friday.add(const Duration(days: 2))),
+        isFalse,
+      );
+    });
+  });
 }

@@ -26,7 +26,6 @@ class DayBlockTile extends StatelessWidget {
     final category = categoryColor(block.category, theme.colorScheme);
     final colors = _tileColors(
       theme: theme,
-      category: category,
       completed: completed,
       proximityHighlight: proximityHighlight,
     );
@@ -111,15 +110,15 @@ class _TileColors {
 
 _TileColors _tileColors({
   required ThemeData theme,
-  required Color category,
   required bool completed,
   required RoutineProximityHighlight proximityHighlight,
 }) {
   if (completed) {
+    final accent = theme.colorScheme.primary;
     return _TileColors(
-      background: category.withValues(alpha: 0.15),
-      border: category.withValues(alpha: 0.6),
-      icon: category,
+      background: theme.colorScheme.surfaceContainerHighest,
+      border: theme.colorScheme.outlineVariant,
+      icon: accent,
       time: theme.colorScheme.onSurfaceVariant,
       title: theme.colorScheme.onSurfaceVariant,
     );

@@ -3,6 +3,33 @@ import '../../../domain/entities/floating_task.dart';
 
 enum FloatingTaskDeadlineUrgency { none, dueToday, overdue }
 
+const completedTasksVisibleMonths = 2;
+
+DateTime completedTasksVisibleSince(DateTime reference) {
+  final today = normalizeDate(reference);
+  var month = today.month - completedTasksVisibleMonths;
+  var year = today.year;
+  if (month <= 0) {
+    month += 12;
+    year -= 1;
+  }
+  final lastDayOfMonth = DateTime(year, month + 1, 0).day;
+  final day = today.day > lastDayOfMonth ? lastDayOfMonth : today.day;
+  return DateTime(year, month, day);
+}
+
+DateTime floatingTaskCompletedAt(FloatingTask task) =>
+    normalizeDate(task.completedAt ?? task.createdAt);
+
+bool isCompletedFloatingTaskWithinVisibleHistory(
+  FloatingTask task,
+  DateTime reference,
+) {
+  if (!task.completed) return false;
+  return !floatingTaskCompletedAt(task)
+      .isBefore(completedTasksVisibleSince(reference));
+}
+
 bool isFloatingTaskVisible(FloatingTask task, DateTime viewDate) {
   if (task.completed) return false;
 
@@ -32,6 +59,35 @@ List<FloatingTask> visibleFloatingTasksForDay(
   final visible = tasks.where((task) => isFloatingTaskVisible(task, viewDate));
   final sorted = visible.toList()..sort(compareFloatingTasks);
   return sorted;
+}
+
+/// Tarefas soltas com prazo na data indicada (visão calendário).
+List<FloatingTask> floatingTasksDueOnDate(
+  List<FloatingTask> tasks,
+  DateTime date,
+) {
+  final normalized = normalizeDate(date);
+  final due = tasks.where((task) {
+    if (task.completed || task.deadline == null) return false;
+    return normalizeDate(task.deadline!) == normalized;
+  }).toList()
+    ..sort(compareFloatingTasks);
+  return due;
+}
+
+bool hasFloatingTasksDueInRange(
+  List<FloatingTask> tasks,
+  DateTime start,
+  DateTime end,
+) {
+  final normalizedStart = normalizeDate(start);
+  final normalizedEnd = normalizeDate(end);
+  return tasks.any((task) {
+    if (task.completed || task.deadline == null) return false;
+    final deadline = normalizeDate(task.deadline!);
+    return !deadline.isBefore(normalizedStart) &&
+        !deadline.isAfter(normalizedEnd);
+  });
 }
 
 int compareFloatingTasks(FloatingTask a, FloatingTask b) {

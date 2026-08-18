@@ -126,4 +126,38 @@ void main() {
 
     await database.close();
   });
+
+  testWidgets('Visão calendário alterna para mês', (WidgetTester tester) async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    final repository = LocalRoutineRepository(database);
+
+    await repository.saveRoutineBlock(
+      RoutineBlock(
+        id: 'treino',
+        weekday: DateTime.now().weekday,
+        startTime: DateTime(2000, 1, 1, 7),
+        title: 'Treino',
+      ),
+    );
+
+    await pumpApp(tester, database: database, repository: repository);
+
+    await tester.tap(find.text('Calendário'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Semana'), findsOneWidget);
+    expect(find.text('Mês'), findsOneWidget);
+    expect(find.text('Hora'), findsOneWidget);
+
+    await tester.tap(find.text('Mês'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Hora'), findsNothing);
+    expect(find.byIcon(Icons.chevron_left), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+
+    await database.close();
+  });
 }

@@ -41,8 +41,18 @@ class LocalRoutineRepository implements RoutineRepository {
   Stream<List<DailyCompletion>> watchCompletionsForWeek(DateTime weekStart) {
     final start = normalizeDate(weekStart);
     final end = start.add(const Duration(days: 6));
-    final startKey = formatDateKey(start);
-    final endKey = formatDateKey(end);
+    return watchCompletionsForRange(start, end);
+  }
+
+  @override
+  Stream<List<DailyCompletion>> watchCompletionsForRange(
+    DateTime start,
+    DateTime end,
+  ) {
+    final normalizedStart = normalizeDate(start);
+    final normalizedEnd = normalizeDate(end);
+    final startKey = formatDateKey(normalizedStart);
+    final endKey = formatDateKey(normalizedEnd);
 
     return (_db.select(_db.dailyCompletions)
           ..where(

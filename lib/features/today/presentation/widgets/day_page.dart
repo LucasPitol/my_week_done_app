@@ -53,7 +53,7 @@ class DayPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Crie rotinas na aba Rotinas.',
+                      'Toque no botão + para criar uma rotina.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

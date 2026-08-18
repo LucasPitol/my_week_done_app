@@ -4,7 +4,8 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../core/constants/app_constants.dart';
 import '../../features/blocks/presentation/block_form_screen.dart';
 import '../../features/blocks/presentation/blocks_screen.dart';
-import '../../features/stats/presentation/stats_screen.dart';
+import '../../features/profile/presentation/profile_screen.dart';
+// import '../../features/stats/presentation/stats_screen.dart';
 import '../../features/today/presentation/today_screen.dart';
 
 class MainShell extends StatefulWidget {
@@ -20,7 +21,8 @@ class _MainShellState extends State<MainShell> {
   static const _screens = [
     TodayScreen(),
     BlocksScreen(),
-    StatsScreen(),
+    ProfileScreen(),
+    // StatsScreen(),
   ];
 
   void _openCreateForm() {
@@ -65,10 +67,15 @@ class _MainShellState extends State<MainShell> {
             label: 'Rotinas',
           ),
           NavigationDestination(
-            icon: Icon(TablerIcons.chart_pie),
-            selectedIcon: Icon(TablerIcons.chart_pie_filled),
-            label: 'Stats',
+            icon: Icon(TablerIcons.user),
+            selectedIcon: Icon(TablerIcons.user_filled),
+            label: 'Perfil',
           ),
+          // NavigationDestination(
+          //   icon: Icon(TablerIcons.chart_pie),
+          //   selectedIcon: Icon(TablerIcons.chart_pie_filled),
+          //   label: 'Stats',
+          // ),
         ],
       ),
     );

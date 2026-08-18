@@ -24,7 +24,6 @@ class FloatingTaskTile extends StatelessWidget {
     final urgency = floatingTaskDeadlineUrgency(task, viewDate);
     final colors = _tileColors(
       theme: theme,
-      category: category,
       completed: task.completed,
       urgency: urgency,
     );
@@ -114,15 +113,15 @@ class _TileColors {
 
 _TileColors _tileColors({
   required ThemeData theme,
-  required Color category,
   required bool completed,
   required FloatingTaskDeadlineUrgency urgency,
 }) {
   if (completed) {
+    final accent = theme.colorScheme.primary;
     return _TileColors(
-      background: category.withValues(alpha: 0.15),
-      border: category.withValues(alpha: 0.6),
-      icon: category,
+      background: theme.colorScheme.surfaceContainerHighest,
+      border: theme.colorScheme.outlineVariant,
+      icon: accent,
       title: theme.colorScheme.onSurfaceVariant,
       deadline: theme.colorScheme.onSurfaceVariant,
     );
