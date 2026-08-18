@@ -6,18 +6,22 @@ import '../../../../domain/entities/routine_block.dart';
 class WeekGridCell extends StatelessWidget {
   const WeekGridCell({
     super.key,
+    required this.date,
     required this.blocks,
     required this.isCompleted,
     required this.onToggle,
+    required this.onOpenDetail,
     required this.isTodayColumn,
     required this.isFocusedColumn,
     required this.width,
     required this.height,
   });
 
+  final DateTime date;
   final List<RoutineBlock> blocks;
   final bool Function(RoutineBlock block) isCompleted;
   final Future<void> Function(RoutineBlock block, bool completed) onToggle;
+  final void Function(RoutineBlock block) onOpenDetail;
   final bool isTodayColumn;
   final bool isFocusedColumn;
   final double width;
@@ -50,6 +54,7 @@ class WeekGridCell extends StatelessWidget {
                       block: block,
                       completed: isCompleted(block),
                       onToggle: onToggle,
+                      onOpenDetail: () => onOpenDetail(block),
                     ),
                   ),
               ],
@@ -63,11 +68,13 @@ class _BlockChip extends StatelessWidget {
     required this.block,
     required this.completed,
     required this.onToggle,
+    required this.onOpenDetail,
   });
 
   final RoutineBlock block;
   final bool completed;
   final Future<void> Function(RoutineBlock block, bool completed) onToggle;
+  final VoidCallback onOpenDetail;
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +97,10 @@ class _BlockChip extends StatelessWidget {
           onTap: () {
             HapticFeedback.lightImpact();
             onToggle(block, !completed);
+          },
+          onLongPress: () {
+            HapticFeedback.mediumImpact();
+            onOpenDetail();
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),

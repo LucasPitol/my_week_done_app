@@ -12,13 +12,17 @@ class DayBlockTile extends StatelessWidget {
     required this.block,
     required this.completed,
     required this.onToggle,
+    required this.onOpenDetail,
     this.proximityHighlight = RoutineProximityHighlight.none,
+    this.hasNote = false,
   });
 
   final RoutineBlock block;
   final bool completed;
   final VoidCallback onToggle;
+  final VoidCallback onOpenDetail;
   final RoutineProximityHighlight proximityHighlight;
+  final bool hasNote;
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +42,8 @@ class DayBlockTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            HapticFeedback.lightImpact();
-            onToggle();
-          },
+          onTap: onOpenDetail,
+          onLongPress: onOpenDetail,
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
@@ -50,13 +52,23 @@ class DayBlockTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                Icon(
-                  completed
-                      ? Icons.check_circle_rounded
-                      : Icons.circle_outlined,
-                  color: colors.icon,
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  tooltip: completed ? 'Desmarcar' : 'Marcar como feito',
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    onToggle();
+                  },
+                  icon: Icon(
+                    completed
+                        ? Icons.check_circle_rounded
+                        : Icons.circle_outlined,
+                    color: colors.icon,
+                  ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 4),
                 Text(
                   formatBlockTime(block.startTime),
                   style: theme.textTheme.labelLarge?.copyWith(
@@ -74,6 +86,15 @@ class DayBlockTile extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (hasNote)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      Icons.sticky_note_2_outlined,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 if (block.category != null)
                   Container(
                     width: 10,

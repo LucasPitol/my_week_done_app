@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/glass/glass_layout_metrics.dart';
 import '../../domain/routine_proximity.dart';
 import '../../providers/today_providers.dart';
 import '../../../floating_tasks/presentation/widgets/floating_task_tile.dart';
 import '../../../floating_tasks/providers/floating_task_providers.dart';
 import 'day_block_tile.dart';
+import 'block_detail_sheet.dart';
 
 class DayPage extends ConsumerWidget {
   const DayPage({
@@ -33,7 +35,7 @@ class DayPage extends ConsumerWidget {
         final completionLookup = buildCompletionLookup(completions);
 
         return ListView(
-          padding: const EdgeInsets.only(bottom: 24),
+          padding: GlassLayoutMetrics.scrollPadding(context),
           children: [
             if (blocks.isEmpty)
               Padding(
@@ -64,13 +66,15 @@ class DayPage extends ConsumerWidget {
               )
             else
               ...blocks.map((block) {
-                final completed =
-                    completionLookup[completionKey(block.id, date)]?.completed ??
-                        false;
+                final completion =
+                    completionLookup[completionKey(block.id, date)];
+                final completed = completion?.completed ?? false;
+                final note = completion?.note;
 
                 return DayBlockTile(
                   block: block,
                   completed: completed,
+                  hasNote: note != null && note.trim().isNotEmpty,
                   proximityHighlight: routineProximityHighlight(
                     date: date,
                     now: now,
@@ -82,6 +86,14 @@ class DayPage extends ConsumerWidget {
                     routineBlockId: block.id,
                     date: date,
                     completed: !completed,
+                  ),
+                  onOpenDetail: () => showBlockDetailSheet(
+                    context: context,
+                    ref: ref,
+                    block: block,
+                    date: date,
+                    completed: completed,
+                    note: note,
                   ),
                 );
               }),

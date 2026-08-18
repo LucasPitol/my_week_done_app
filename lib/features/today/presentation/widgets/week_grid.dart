@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/glass/glass_layout_metrics.dart';
 import '../../../../core/utils/week_utils.dart';
 import '../../../../domain/entities/daily_completion.dart';
 import '../../../../domain/entities/floating_task.dart';
@@ -8,6 +9,7 @@ import '../../../../domain/entities/routine_block.dart';
 import '../../../floating_tasks/domain/floating_task_visibility.dart';
 import '../../../floating_tasks/providers/floating_task_providers.dart';
 import '../../providers/today_providers.dart';
+import 'block_detail_sheet.dart';
 import 'week_day_header.dart';
 import 'week_floating_task_chip.dart';
 import 'week_grid_cell.dart';
@@ -74,6 +76,18 @@ class WeekGrid extends ConsumerWidget {
               id: task.id,
               completed: !task.completed,
             ),
+            onOpenDetail: (block, date) {
+              final lookup = buildCompletionLookup(completions);
+              final completion = lookup[completionKey(block.id, date)];
+              showBlockDetailSheet(
+                context: context,
+                ref: ref,
+                block: block,
+                date: date,
+                completed: completion?.completed ?? false,
+                note: completion?.note,
+              );
+            },
           ),
         ),
       ),
@@ -92,6 +106,7 @@ class _WeekGridBody extends StatefulWidget {
     required this.focusedDate,
     required this.onToggle,
     required this.onToggleFloatingTask,
+    required this.onOpenDetail,
   });
 
   final ThemeData theme;
@@ -107,6 +122,7 @@ class _WeekGridBody extends StatefulWidget {
     bool completed,
   ) onToggle;
   final Future<void> Function(FloatingTask task) onToggleFloatingTask;
+  final void Function(RoutineBlock block, DateTime date) onOpenDetail;
 
   @override
   State<_WeekGridBody> createState() => _WeekGridBodyState();
@@ -203,6 +219,7 @@ class _WeekGridBodyState extends State<_WeekGridBody> {
           child: !hasGridContent
               ? _EmptyWeekState(theme: widget.theme)
               : SingleChildScrollView(
+                  padding: GlassLayoutMetrics.scrollPadding(context),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     controller: _horizontalScrollController,
@@ -220,6 +237,7 @@ class _WeekGridBodyState extends State<_WeekGridBody> {
                               focusedDate: widget.focusedDate,
                               completionLookup: completionLookup,
                               onToggle: widget.onToggle,
+                              onOpenDetail: widget.onOpenDetail,
                             ),
                           if (hasFloatingTasksInWeek)
                             _FloatingTasksRow(
@@ -249,6 +267,7 @@ class _HourRow extends StatelessWidget {
     required this.focusedDate,
     required this.completionLookup,
     required this.onToggle,
+    required this.onOpenDetail,
   });
 
   final int hour;
@@ -262,6 +281,7 @@ class _HourRow extends StatelessWidget {
     DateTime date,
     bool completed,
   ) onToggle;
+  final void Function(RoutineBlock block, DateTime date) onOpenDetail;
 
   @override
   Widget build(BuildContext context) {
@@ -288,6 +308,7 @@ class _HourRow extends StatelessWidget {
         ),
         for (final day in weekDays)
           WeekGridCell(
+            date: day,
             width: WeekGrid.dayColumnWidth,
             height: WeekGrid.rowHeight,
             isTodayColumn: isSameDay(day, today),
@@ -304,6 +325,7 @@ class _HourRow extends StatelessWidget {
               return completion?.completed ?? false;
             },
             onToggle: (block, completed) => onToggle(block, day, completed),
+            onOpenDetail: (block) => onOpenDetail(block, day),
           ),
       ],
     );

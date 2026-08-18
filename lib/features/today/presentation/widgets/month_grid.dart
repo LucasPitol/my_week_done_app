@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/glass/glass_layout_metrics.dart';
 import '../../../../core/utils/calendar_utils.dart';
 import '../../../../core/utils/week_utils.dart';
 import '../../../../domain/entities/daily_completion.dart';
@@ -67,12 +68,13 @@ class MonthGrid extends ConsumerWidget {
                 const hSpacing = 8.0;
                 const vSpacing = 8.0;
                 const headerHeight = 28.0;
+                final bottomInset = GlassLayoutMetrics.scrollBottomInset(context);
 
                 final cellWidth =
                     (constraints.maxWidth - hSpacing * (colCount - 1)) /
                         colCount;
                 final availableHeight =
-                    constraints.maxHeight - headerHeight - vSpacing;
+                    constraints.maxHeight - headerHeight - vSpacing - bottomInset;
                 final cellHeight =
                     (availableHeight - vSpacing * (rowCount - 1)) / rowCount;
 

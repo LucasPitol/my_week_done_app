@@ -12,5 +12,20 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "AccessibilityPlugin") {
+      let channel = FlutterMethodChannel(
+        name: "my_week_done_app/accessibility",
+        binaryMessenger: registrar.messenger()
+      )
+      channel.setMethodCallHandler { call, result in
+        switch call.method {
+        case "isReduceTransparencyEnabled":
+          result(UIAccessibility.isReduceTransparencyEnabled)
+        default:
+          result(FlutterMethodNotImplemented)
+        }
+      }
+    }
   }
 }

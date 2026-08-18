@@ -57,7 +57,7 @@ void main() {
     expect(find.text('Dia'), findsOneWidget);
     expect(find.text('Calendário'), findsOneWidget);
     expect(find.text('Tarefas soltas'), findsOneWidget);
-    expect(find.text('Rotinas'), findsWidgets);
+    expect(find.byTooltip('Rotinas'), findsOneWidget);
     expect(find.text('Hora'), findsNothing);
 
     await database.close();
@@ -105,7 +105,7 @@ void main() {
     await pumpApp(tester, database: database, repository: repository);
 
     await tester.ensureVisible(find.byKey(const ValueKey('block-treino')));
-    await tester.tap(find.byKey(const ValueKey('block-treino')));
+    await tester.tap(find.byIcon(Icons.circle_outlined));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -117,7 +117,7 @@ void main() {
     expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
 
     await tester.ensureVisible(find.byKey(const ValueKey('block-treino')));
-    await tester.tap(find.byKey(const ValueKey('block-treino')));
+    await tester.tap(find.byIcon(Icons.check_circle_rounded));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 

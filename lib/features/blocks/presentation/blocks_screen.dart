@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/theme/glass/glass_layout_metrics.dart';
+
 import '../../../core/utils/week_utils.dart';
 import '../../../domain/entities/floating_task.dart';
 import '../../../domain/entities/routine_block.dart';
@@ -164,7 +166,7 @@ class BlocksScreen extends ConsumerWidget {
               );
 
               return ListView(
-                padding: const EdgeInsets.only(bottom: 24),
+                padding: GlassLayoutMetrics.scrollPadding(context),
                 children: [
                   if (blocks.isNotEmpty)
                     for (final weekday in grouped.keys.toList()..sort())

@@ -21,7 +21,7 @@ Todas com toque único pra copiar + feedback (haptic + toast "copiado")
 
 Versão do app (número de build, útil pra suporte)
 Avalie o app (deep link pra store)
-Política de privacidade — 
+Política de privacidade — https://shorthaired-room-291.notion.site/Pol-tica-de-Privacidade-Habi-My-Week-Done-c290c7f7a8e8468990e82d929db869fd?source=copy_link
 
 
 Por que esse recorte "sem exagero" faz sentido
