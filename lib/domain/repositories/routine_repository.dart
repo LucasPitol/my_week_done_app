@@ -42,4 +42,6 @@ abstract class RoutineRepository {
     required String id,
     required bool completed,
   });
+
+  Future<void> clearAllData();
 }

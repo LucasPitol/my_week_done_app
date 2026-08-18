@@ -196,6 +196,9 @@ class LocalRoutineRepository implements RoutineRepository {
   }
 
   @override
+  Future<void> clearAllData() => _db.clearAllData();
+
+  @override
   Future<void> toggleFloatingTaskCompletion({
     required String id,
     required bool completed,

@@ -323,4 +323,42 @@ void main() {
       expect(adherence, 1.0);
     });
   });
+
+  group('clearAllData', () {
+    test('remove todos os blocos, conclusões e tarefas soltas', () async {
+      await repository.saveRoutineBlock(
+        RoutineBlock(
+          id: 'block-1',
+          weekday: 1,
+          startTime: DateTime(2000, 1, 1, 7),
+          title: 'Treino',
+        ),
+      );
+
+      await repository.saveFloatingTask(
+        FloatingTask(
+          id: 'task-1',
+          title: 'Tarefa avulsa',
+          completed: false,
+          createdAt: DateTime(2026, 7, 7),
+        ),
+      );
+
+      await repository.toggleCompletion(
+        routineBlockId: 'block-1',
+        date: DateTime(2026, 7, 7),
+        completed: true,
+      );
+
+      await repository.clearAllData();
+
+      final blocks = await repository.watchRoutineBlocks().first;
+      final tasks = await repository.watchFloatingTasks().first;
+      final completions = await database.select(database.dailyCompletions).get();
+
+      expect(blocks, isEmpty);
+      expect(tasks, isEmpty);
+      expect(completions, isEmpty);
+    });
+  });
 }

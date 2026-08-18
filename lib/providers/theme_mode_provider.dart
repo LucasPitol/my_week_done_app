@@ -17,7 +17,7 @@ class ThemeModeSettings extends AsyncNotifier<AppThemePreference> {
     final stored = prefs.getString(_themeModeKey);
     return AppThemePreference.values.firstWhere(
       (mode) => mode.name == stored,
-      orElse: () => AppThemePreference.dark,
+      orElse: () => AppThemePreference.system,
     );
   }
 
@@ -35,7 +35,7 @@ final themeModeSettingsProvider =
 
 final resolvedThemeModeProvider = Provider<ThemeMode>((ref) {
   final preference =
-      ref.watch(themeModeSettingsProvider).value ?? AppThemePreference.dark;
+      ref.watch(themeModeSettingsProvider).value ?? AppThemePreference.system;
 
   return switch (preference) {
     AppThemePreference.light => ThemeMode.light,

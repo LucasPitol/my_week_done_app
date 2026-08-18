@@ -34,6 +34,14 @@ class AppDatabase extends _$AppDatabase {
         },
       );
 
+  Future<void> clearAllData() async {
+    await transaction(() async {
+      await delete(dailyCompletions).go();
+      await delete(floatingTasks).go();
+      await delete(routineBlocks).go();
+    });
+  }
+
   Future<void> _backfillRoutineBlockGroups() async {
     const uuid = Uuid();
     final rows = await select(routineBlocks).get();
