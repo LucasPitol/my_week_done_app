@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
-import '../../core/theme/glass/glass_layout_metrics.dart';
-import '../../core/widgets/glass/bottom_content_fade.dart';
-import '../../core/widgets/glass/glass_fab.dart';
-import '../../core/widgets/glass/glass_tab_bar.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/widgets/floating_pill_tab_bar.dart';
 import '../../features/blocks/presentation/block_form_screen.dart';
 import '../../features/blocks/presentation/blocks_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
@@ -43,44 +41,23 @@ class _MainShellState extends State<MainShell> {
 
     return Scaffold(
       extendBody: true,
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned.fill(
-            child: IndexedStack(
-              index: _currentIndex,
-              children: _screens,
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: GlassLayoutMetrics.tabBarBottom(context) +
-                GlassLayoutMetrics.tabBarHeight,
-            child: const Align(
-              alignment: Alignment.bottomCenter,
-              child: BottomContentFade(),
-            ),
-          ),
-          if (showFab)
-            Positioned(
-              right: GlassLayoutMetrics.fabRightInset,
-              bottom: GlassLayoutMetrics.fabBottom(context),
-              child: GlassFab(onPressed: _openCreateForm),
-            ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: GlassTabBar(
-              selectedIndex: _currentIndex,
-              onDestinationSelected: (index) {
-                setState(() => _currentIndex = index);
-              },
-              destinations: defaultGlassTabDestinations,
-            ),
-          ),
-        ],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      floatingActionButton: showFab
+          ? FloatingActionButton(
+              onPressed: _openCreateForm,
+              tooltip: 'Novo',
+              child: const Icon(TablerIcons.plus),
+            )
+          : null,
+      bottomNavigationBar: FloatingPillTabBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() => _currentIndex = index);
+        },
+        destinations: defaultPillTabDestinations,
       ),
     );
   }

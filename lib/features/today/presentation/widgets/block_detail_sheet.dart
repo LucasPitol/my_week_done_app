@@ -5,7 +5,6 @@ import '../../../../domain/entities/routine_block.dart';
 import '../../../../providers/repository_providers.dart';
 import '../../../blocks/domain/block_form_utils.dart';
 import '../../providers/today_providers.dart';
-import '../../../../core/widgets/glass/glass_bottom_sheet.dart';
 
 Future<void> showBlockDetailSheet({
   required BuildContext context,
@@ -15,9 +14,10 @@ Future<void> showBlockDetailSheet({
   required bool completed,
   String? note,
 }) {
-  return showGlassBottomSheet<void>(
+  return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    showDragHandle: false,
     builder: (sheetContext) {
       return BlockDetailSheet(
         block: block,

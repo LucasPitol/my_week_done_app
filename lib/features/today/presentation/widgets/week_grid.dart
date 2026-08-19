@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/glass/glass_layout_metrics.dart';
+import '../../../../core/theme/nav_layout_metrics.dart';
 import '../../../../core/utils/week_utils.dart';
 import '../../../../domain/entities/daily_completion.dart';
 import '../../../../domain/entities/floating_task.dart';
@@ -219,7 +219,7 @@ class _WeekGridBodyState extends State<_WeekGridBody> {
           child: !hasGridContent
               ? _EmptyWeekState(theme: widget.theme)
               : SingleChildScrollView(
-                  padding: GlassLayoutMetrics.scrollPadding(context),
+                  padding: NavLayoutMetrics.scrollPadding(context),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     controller: _horizontalScrollController,

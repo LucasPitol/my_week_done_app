@@ -3,11 +3,12 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../core/constants/profile_constants.dart';
 import '../../../../core/utils/clipboard_utils.dart';
-import '../../../../core/widgets/glass/glass_bottom_sheet.dart';
 
 Future<void> showPixQrSheet(BuildContext context) {
-  return showGlassBottomSheet<void>(
+  return showModalBottomSheet<void>(
     context: context,
+    isScrollControlled: true,
+    showDragHandle: false,
     builder: (context) {
       final theme = Theme.of(context);
 

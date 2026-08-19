@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../core/constants/profile_constants.dart';
-import '../../../core/theme/glass/glass_layout_metrics.dart';
+import '../../../core/theme/nav_layout_metrics.dart';
 import '../../../core/utils/clipboard_utils.dart';
 import '../../../core/utils/url_launch_utils.dart';
 import '../../../providers/theme_mode_provider.dart';
@@ -28,7 +28,7 @@ class ProfileScreen extends ConsumerWidget {
         title: const Text('Perfil'),
       ),
       body: ListView(
-        padding: GlassLayoutMetrics.scrollPadding(context).copyWith(
+        padding: NavLayoutMetrics.scrollPadding(context).copyWith(
           left: 16,
           right: 16,
           top: 16,

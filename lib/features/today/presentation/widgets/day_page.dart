@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/glass/glass_layout_metrics.dart';
+import '../../../../core/theme/nav_layout_metrics.dart';
 import '../../domain/routine_proximity.dart';
 import '../../providers/today_providers.dart';
 import '../../../floating_tasks/presentation/widgets/floating_task_tile.dart';
@@ -35,7 +35,7 @@ class DayPage extends ConsumerWidget {
         final completionLookup = buildCompletionLookup(completions);
 
         return ListView(
-          padding: GlassLayoutMetrics.scrollPadding(context),
+          padding: NavLayoutMetrics.scrollPadding(context),
           children: [
             if (blocks.isEmpty)
               Padding(

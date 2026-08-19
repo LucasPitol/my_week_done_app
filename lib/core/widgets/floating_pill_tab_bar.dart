@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
-import '../../theme/glass/glass_layout_metrics.dart';
-import '../../theme/glass/glass_tokens.dart';
-import 'glass_surface.dart';
+import '../theme/nav_layout_metrics.dart';
 
-class GlassTabDestination {
-  const GlassTabDestination({
+class PillTabDestination {
+  const PillTabDestination({
     required this.icon,
     required this.selectedIcon,
     required this.tooltip,
@@ -18,8 +16,8 @@ class GlassTabDestination {
   final String tooltip;
 }
 
-class GlassTabBar extends StatelessWidget {
-  const GlassTabBar({
+class FloatingPillTabBar extends StatelessWidget {
+  const FloatingPillTabBar({
     super.key,
     required this.selectedIndex,
     required this.onDestinationSelected,
@@ -28,7 +26,7 @@ class GlassTabBar extends StatelessWidget {
 
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
-  final List<GlassTabDestination> destinations;
+  final List<PillTabDestination> destinations;
 
   @override
   Widget build(BuildContext context) {
@@ -36,22 +34,26 @@ class GlassTabBar extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        GlassLayoutMetrics.tabBarHorizontalInset,
+        NavLayoutMetrics.tabBarHorizontalInset,
         0,
-        GlassLayoutMetrics.tabBarHorizontalInset,
-        GlassLayoutMetrics.tabBarBottom(context),
+        NavLayoutMetrics.tabBarHorizontalInset,
+        NavLayoutMetrics.tabBarBottom(context),
       ),
-      child: GlassSurface(
-        borderRadius: BorderRadius.circular(GlassLayoutMetrics.tabBarHeight / 2),
-        blurSigma: GlassTokens.tabBarBlur,
-        backgroundOpacity: GlassTokens.tabBarOpacity,
+      child: Material(
+        elevation: 4,
+        shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.25),
+        color: theme.colorScheme.surfaceContainerHigh,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(NavLayoutMetrics.tabBarHeight / 2),
+          side: BorderSide(color: theme.colorScheme.outline),
+        ),
         child: SizedBox(
-          height: GlassLayoutMetrics.tabBarHeight,
+          height: NavLayoutMetrics.tabBarHeight,
           child: Row(
             children: [
               for (var index = 0; index < destinations.length; index++)
                 Expanded(
-                  child: _GlassTabItem(
+                  child: _PillTabItem(
                     destination: destinations[index],
                     selected: selectedIndex == index,
                     primaryColor: theme.colorScheme.primary,
@@ -72,8 +74,8 @@ class GlassTabBar extends StatelessWidget {
   }
 }
 
-class _GlassTabItem extends StatelessWidget {
-  const _GlassTabItem({
+class _PillTabItem extends StatelessWidget {
+  const _PillTabItem({
     required this.destination,
     required this.selected,
     required this.primaryColor,
@@ -81,7 +83,7 @@ class _GlassTabItem extends StatelessWidget {
     required this.onTap,
   });
 
-  final GlassTabDestination destination;
+  final PillTabDestination destination;
   final bool selected;
   final Color primaryColor;
   final Color inactiveColor;
@@ -120,19 +122,18 @@ class _GlassTabItem extends StatelessWidget {
   }
 }
 
-/// Destinos padrão do app — espelham a bottom nav anterior.
-const defaultGlassTabDestinations = [
-  GlassTabDestination(
+const defaultPillTabDestinations = [
+  PillTabDestination(
     icon: TablerIcons.calendar_week,
     selectedIcon: TablerIcons.calendar_event,
     tooltip: 'Hoje',
   ),
-  GlassTabDestination(
+  PillTabDestination(
     icon: TablerIcons.list_details,
     selectedIcon: TablerIcons.list,
     tooltip: 'Rotinas',
   ),
-  GlassTabDestination(
+  PillTabDestination(
     icon: TablerIcons.user,
     selectedIcon: TablerIcons.user_filled,
     tooltip: 'Perfil',
