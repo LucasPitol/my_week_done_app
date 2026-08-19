@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/app_primary_button.dart';
 import '../../../../domain/entities/routine_block.dart';
 import '../../../../providers/repository_providers.dart';
 import '../../../blocks/domain/block_form_utils.dart';
@@ -167,9 +168,13 @@ class _BlockDetailSheetState extends ConsumerState<BlockDetailSheet> {
               onEditingComplete: _persistNote,
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: _saving ? null : _close,
-              child: Text(_saving ? 'Salvando…' : 'Fechar'),
+            SizedBox(
+              width: double.infinity,
+              child: AppPrimaryButton(
+                onPressed: _saving ? null : _close,
+                label: _saving ? 'Salvando…' : 'Fechar',
+                isLoading: _saving,
+              ),
             ),
           ],
         ),

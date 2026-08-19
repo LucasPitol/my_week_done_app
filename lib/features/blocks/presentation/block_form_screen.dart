@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/week_utils.dart';
+import '../../../core/widgets/app_primary_button.dart';
 import '../../../data/mappers/routine_mappers.dart';
 import '../../../domain/entities/floating_task.dart';
 import '../../../domain/entities/routine_block.dart';
@@ -85,6 +86,13 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
         _selectedWeekdays = {};
       }
     }
+
+    _titleController.addListener(() => setState(() {}));
+  }
+
+  bool get _canSubmit {
+    if (_isSaving) return false;
+    return _titleController.text.trim().isNotEmpty;
   }
 
   @override
@@ -375,7 +383,7 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
             if (showModeToggle) ...[
               SegmentedButton<ItemFormMode>(
@@ -502,18 +510,14 @@ class _BlockFormScreenState extends ConsumerState<BlockFormScreen> {
               onChanged: (category) =>
                   setState(() => _selectedCategory = category),
             ),
-            const SizedBox(height: 32),
-            FilledButton(
-              onPressed: _isSaving ? null : _save,
-              child: _isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(_saveButtonLabel()),
-            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: AppPrimaryButtonBar(
+        child: AppPrimaryButton(
+          onPressed: _canSubmit ? _save : null,
+          label: _saveButtonLabel(),
+          isLoading: _isSaving,
         ),
       ),
     );

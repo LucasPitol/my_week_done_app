@@ -170,6 +170,73 @@ Glass é tempero, não prato principal. No My Week Done, ele aparece em 3 lugare
 
 Documento de referência para tipografia e decisões visuais do MVP.
 
+## Botão primário (CTA)
+
+Componente global: `AppPrimaryButton` em `lib/core/widgets/app_primary_button.dart`.  
+Footer fixo sobre formulários: `AppPrimaryButtonBar` (mesmo arquivo).
+
+### Forma e tipografia
+
+| Propriedade | Valor |
+|---|---|
+| Altura | 52 px |
+| Formato | Pill (raio = metade da altura) |
+| Fonte | **Satoshi**, peso **600** |
+| Cor do texto (ativo) | `onPrimary` do tema (`#0B0F0D` no dark) |
+| Cor de fundo (ativo) | Acento primário (`#6FCF97` dark / `#3F9463` light) |
+
+### Profundidade (estado padrão)
+
+- **Sombra**: tint do acento primário a 25% de opacidade — `blur ~20px`, `offset Y ~6px` (não usar sombra preta genérica)
+- **Brilho especular**: gradiente branco translúcido no topo (15% → 0% de opacidade nos primeiros 30% da altura), reforçando a linguagem de vidro já usada no FAB
+
+### Estados
+
+| Estado | Comportamento |
+|---|---|
+| **Padrão** | Cor sólida + sombra + brilho especular |
+| **Pressed** | Scale `0.97`, tom ~10% mais escuro, sem sombra (efeito de afundar) |
+| **Disabled** | Fundo neutro (`outline` da paleta), texto `onSurfaceVariant`, opacidade geral ~40% |
+| **Loading** | Spinner no lugar do label, interação bloqueada |
+
+### Footer fixo (`AppPrimaryButtonBar`)
+
+Usar em telas com formulário rolável (ex.: criar/editar rotina):
+
+- Padding inferior = **safe area + 16 px** — nunca colar na borda da tela
+- Fundo com **blur ~20px** e opacidade ~72% sobre `scaffoldBackgroundColor`
+- Borda superior sutil (`outline` a ~35%) separando a camada de ação do conteúdo que rola por trás
+- Botão ocupa largura total dentro do footer
+
+### Uso no código
+
+```dart
+// CTA inline (empty state, onboarding, sheet)
+SizedBox(
+  width: double.infinity,
+  child: AppPrimaryButton(
+    onPressed: canSubmit ? onSave : null,
+    label: 'Criar rotina',
+    isLoading: isSaving,
+  ),
+)
+
+// Formulário com scroll — footer fixo
+bottomNavigationBar: AppPrimaryButtonBar(
+  child: AppPrimaryButton(
+    onPressed: canSubmit ? onSave : null,
+    label: 'Criar rotina',
+    isLoading: isSaving,
+  ),
+)
+```
+
+### O que não é botão primário
+
+Ações destrutivas (`Excluir`, `Limpar dados`) continuam com `FilledButton` estilizado em vermelho (`colorScheme.error`) — fora do escopo do CTA primário.
+
+---
+
 ## Tipografia
 
 ### Decisão
@@ -242,6 +309,7 @@ Constantes de família em `lib/core/theme/app_fonts.dart`:
 | `pubspec.yaml` → `flutter.fonts` | Declaração da Satoshi |
 | `lib/core/theme/app_theme.dart` | `TextTheme` e tema global |
 | `lib/core/theme/app_fonts.dart` | Nomes das famílias |
+| `lib/core/widgets/app_primary_button.dart` | CTA primário (`AppPrimaryButton`) e footer (`AppPrimaryButtonBar`) |
 
 ## Manutenção
 

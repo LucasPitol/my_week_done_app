@@ -3,6 +3,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../core/constants/profile_constants.dart';
 import '../../../../core/utils/clipboard_utils.dart';
+import '../../../../core/widgets/app_primary_button.dart';
 
 Future<void> showPixQrSheet(BuildContext context) {
   return showModalBottomSheet<void>(
@@ -58,13 +59,16 @@ Future<void> showPixQrSheet(BuildContext context) {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            FilledButton.icon(
-              onPressed: () => copyToClipboard(
-                context,
-                text: ProfileConstants.pixKey,
+            SizedBox(
+              width: double.infinity,
+              child: AppPrimaryButton(
+                onPressed: () => copyToClipboard(
+                  context,
+                  text: ProfileConstants.pixKey,
+                ),
+                icon: Icons.copy_rounded,
+                label: 'Copiar chave',
               ),
-              icon: const Icon(Icons.copy_rounded),
-              label: const Text('Copiar chave'),
             ),
           ],
         ),

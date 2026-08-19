@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import '../../../../core/widgets/app_primary_button.dart';
+
 class EmptyBlocksState extends StatelessWidget {
   const EmptyBlocksState({
     super.key,
@@ -39,10 +41,10 @@ class EmptyBlocksState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            FilledButton.icon(
+            AppPrimaryButton(
               onPressed: onCreate,
-              icon: const Icon(TablerIcons.plus),
-              label: const Text('Criar primeira rotina'),
+              icon: TablerIcons.plus,
+              label: 'Criar primeira rotina',
             ),
           ],
         ),

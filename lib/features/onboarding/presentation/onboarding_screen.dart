@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/widgets/app_primary_button.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({
@@ -31,9 +32,12 @@ class OnboardingScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const Spacer(),
-              FilledButton(
-                onPressed: onComplete,
-                child: const Text('Começar'),
+              SizedBox(
+                width: double.infinity,
+                child: AppPrimaryButton(
+                  onPressed: onComplete,
+                  label: 'Começar',
+                ),
               ),
             ],
           ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/app_primary_button.dart';
+
 enum BlockScopeChoice {
   allInGroup,
   singleOnly,
@@ -52,9 +54,9 @@ Future<BlockScopeChoice?> showBlockScopeDialog(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Cancelar'),
               ),
-              FilledButton(
+              AppPrimaryButton(
                 onPressed: () => Navigator.pop(context, selected),
-                child: const Text('Confirmar'),
+                label: 'Confirmar',
               ),
             ],
           );
