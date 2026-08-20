@@ -26,7 +26,7 @@ lib/
 ## Stack
 
 - **Flutter** + **Riverpod** para estado
-- **Repository pattern** — UI desacoplada do storage (local hoje, Supabase no futuro)
+- **Repository pattern** — UI desacoplada do storage (local hoje, cloud amanhã)
 - **LocalRoutineRepository** com SQLite via Drift (persistência local v1)
 
 ## Rodar
